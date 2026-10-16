@@ -1,0 +1,6 @@
+{
+  "name": "Learn From My Document",
+  "description": "Transform any PDF, TXT, or Markdown document into an interactive, grounded learning course with verified source quotes, checks, and flashcards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
