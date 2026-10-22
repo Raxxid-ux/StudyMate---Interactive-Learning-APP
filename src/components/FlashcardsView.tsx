@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Layers, RotateCcw, CheckCircle, ChevronLeft, ChevronRight, AlertCircle, Sparkles } from 'lucide-react';
+import { Layers, RotateCcw, CheckCircle, ChevronLeft, ChevronRight, AlertCircle } from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import type { CourseData, GlossaryItem } from '../types.ts';
 
@@ -91,7 +91,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <div className="max-w-2xl mx-auto px-4 pt-8 pb-36 sm:px-6 lg:px-8 space-y-8">
       {/* Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-zinc-800 pb-5">
         <div>
@@ -230,21 +230,23 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
           </div>
 
           {/* Navigation Controls */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <button
+              type="button"
               onClick={handlePrev}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-[#3A3F4F] dark:text-[#F1F3F7] font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] text-xs sm:text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer whitespace-nowrap shadow-2xs"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
+              <ChevronLeft className="w-4 h-4 shrink-0" />
+              <span className="leading-none">Previous</span>
             </button>
 
             <button
+              type="button"
               onClick={handleNext}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#1A6EF0] text-white font-semibold hover:opacity-95 transition-opacity cursor-pointer shadow-xs"
+              className="h-11 px-5 inline-flex items-center justify-center gap-2 rounded-xl bg-[#1A6EF0] text-white text-xs sm:text-sm font-semibold hover:bg-[#1558C4] transition-colors cursor-pointer shadow-xs whitespace-nowrap"
             >
-              <span>Next Card</span>
-              <ChevronRight className="w-4 h-4" />
+              <span className="leading-none">Next Card</span>
+              <ChevronRight className="w-4 h-4 shrink-0" />
             </button>
           </div>
         </div>

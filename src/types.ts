@@ -86,3 +86,28 @@ export interface CourseProgress {
   sectionAnswers: Record<string, QuizAnswer>;
   mistakes: MistakeRecord[];
 }
+
+export interface StudyConfiguration {
+  fontSize: 'standard' | 'large' | 'xlarge';
+  theme: 'daylight' | 'slate' | 'twilight';
+  plainWordsDefault: boolean;
+  studyPace: 'calm' | 'balanced' | 'fast';
+  audioFeedback: boolean;
+  questionTypeFilter: 'all' | 'multiple-choice' | 'true-false' | 'fill-in-the-blank';
+  autoAdvanceChunks: boolean;
+}
+
+export interface MemoChatMessage {
+  id: string;
+  sender: 'user' | 'memo';
+  text: string;
+  timestamp: string;
+  sourceQuote?: string;
+  suggestedAction?: {
+    key: string;
+    value: any;
+    description: string;
+  };
+  suggestedFollowUps?: string[];
+}
+

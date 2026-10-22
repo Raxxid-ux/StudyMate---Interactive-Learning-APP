@@ -13,13 +13,65 @@ import { ReviewMistakesView } from './components/ReviewMistakesView.tsx';
 import { FlashcardsView } from './components/FlashcardsView.tsx';
 import { FinalQuizView } from './components/FinalQuizView.tsx';
 import { ContentAuditLedger } from './components/ContentAuditLedger.tsx';
-import type { CourseData, Question, QuizAnswer, MistakeRecord, Section } from './types.ts';
+import { MemoChatbot } from './components/MemoChatbot.tsx';
+import { SettingsModal } from './components/SettingsModal.tsx';
+import { playCalmChime, playSoftTap } from './utils/audioChimes.ts';
+import type { CourseData, Question, QuizAnswer, MistakeRecord, Section, StudyConfiguration } from './types.ts';
 
 const STORAGE_COURSE_KEY = 'lfmd_active_course_v2';
 const STORAGE_PROGRESS_KEY = 'lfmd_active_progress_v2';
+const STORAGE_CONFIG_KEY = 'memo_study_config_v1';
 
 export function AppContent() {
-  const { fontSizeClass } = useThemeAndText();
+  const { fontSizeClass, setTextSize, setTheme } = useThemeAndText();
+
+  // Study Configuration State (used across lessons, settings, and Memo companion)
+  const [studyConfig, setStudyConfig] = useState<StudyConfiguration>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_CONFIG_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      fontSize: 'standard',
+      theme: 'daylight',
+      plainWordsDefault: false,
+      studyPace: 'calm',
+      audioFeedback: true,
+      questionTypeFilter: 'all',
+      autoAdvanceChunks: false,
+    };
+  });
+
+  const handleUpdateStudyConfig = (newConfig: Partial<StudyConfiguration>) => {
+    setStudyConfig((prev) => {
+      const updated = { ...prev, ...newConfig };
+      try {
+        localStorage.setItem(STORAGE_CONFIG_KEY, JSON.stringify(updated));
+      } catch {}
+
+      // Sync with ThemeAndTextContext
+      if (newConfig.fontSize) {
+        if (newConfig.fontSize === 'standard') setTextSize('normal');
+        else if (newConfig.fontSize === 'large') setTextSize('large');
+        else if (newConfig.fontSize === 'xlarge') setTextSize('xlarge');
+      }
+      if (newConfig.theme) {
+        if (newConfig.theme === 'slate' || newConfig.theme === 'twilight') {
+          setTheme('dark');
+        } else {
+          setTheme('light');
+        }
+      }
+
+      return updated;
+    });
+  };
+
+  // State to control Memo drawer open/close
+  const [isMemoOpen, setIsMemoOpen] = useState(false);
+
+  // State to control Settings modal open/close
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Course & Navigation State
   const [course, setCourse] = useState<CourseData | null>(() => {
@@ -456,6 +508,7 @@ export function AppContent() {
     }));
 
     if (!isCorrect) {
+      playSoftTap(studyConfig.audioFeedback);
       setMistakes((prev) => {
         const filtered = prev.filter((m) => m.questionId !== question.id);
         return [
@@ -469,6 +522,7 @@ export function AppContent() {
         ];
       });
     } else {
+      playCalmChime(studyConfig.audioFeedback);
       setMistakes((prev) => prev.filter((m) => m.questionId !== question.id));
     }
   };
@@ -527,7 +581,7 @@ export function AppContent() {
   const currentSection = course?.sections[currentSectionIndex] || null;
 
   return (
-    <div className="min-h-screen bg-[#EDF0F5] dark:bg-[#12151B] text-[#3A3F4F] dark:text-[#F1F3F7] flex flex-col font-sans antialiased transition-colors">
+    <div className="min-h-screen w-full bg-[#EDF0F5] dark:bg-[#12151B] text-[#3A3F4F] dark:text-[#F1F3F7] flex flex-col font-sans antialiased transition-colors overflow-x-hidden">
       <Navbar
         course={isProcessing ? null : course}
         activeTab={activeTab}
@@ -535,9 +589,11 @@ export function AppContent() {
         mistakes={mistakes}
         onNewDocumentClick={() => setShowNewDocConfirm(true)}
         completedSectionCount={completedSectionIndices.length}
+        onOpenMemo={() => setIsMemoOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 w-full flex flex-col overflow-hidden">
         {!course || isProcessing ? (
           <UploadScreen
             onStartCourse={handleStartCourse}
@@ -545,10 +601,12 @@ export function AppContent() {
             progressStep={progressStep}
             errorMessage={errorMessage}
             onRetry={handleRetryStep}
+            onOpenMemo={() => setIsMemoOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
           />
         ) : (
-          <div className="flex-1 flex flex-col lg:flex-row">
-            {/* Left Sidebar Menu */}
+          <div className="flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-4rem)] lg:overflow-hidden bg-white dark:bg-[#0E1117]">
+            {/* Mobile View: Collapsible Lesson Dropdown Selector at Top */}
             {activeTab === 'lesson' && (
               <Sidebar
                 course={course}
@@ -556,11 +614,26 @@ export function AppContent() {
                 onSelectSection={(idx) => setCurrentSectionIndex(idx)}
                 completedSectionIndices={completedSectionIndices}
                 onRetrySection={handleRetrySection}
+                onOpenMemo={() => setIsMemoOpen(true)}
+                mobileOnly={true}
               />
             )}
 
-            {/* Right Lesson Content Area */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Desktop View: Dedicated Left Panel (Course Sections, 3D Memo & Key Notes) */}
+            {activeTab === 'lesson' && (
+              <Sidebar
+                course={course}
+                currentSectionIndex={currentSectionIndex}
+                onSelectSection={(idx) => setCurrentSectionIndex(idx)}
+                completedSectionIndices={completedSectionIndices}
+                onRetrySection={handleRetrySection}
+                onOpenMemo={() => setIsMemoOpen(true)}
+                desktopOnly={true}
+              />
+            )}
+
+            {/* Main Lesson Content Area: Flexible, scrollable, pristine reading layout */}
+            <div className="flex-1 min-h-0 w-full h-full overflow-y-auto bg-white dark:bg-[#0E1117] flex flex-col">
               {activeTab === 'lesson' && currentSection && (
                 <LessonView
                   section={currentSection}
@@ -575,6 +648,8 @@ export function AppContent() {
                   onAnswerQuestion={handleAnswerQuestion}
                   onFetchPlainWords={handleFetchPlainWords}
                   isFetchingPlainWords={isFetchingPlainWords}
+                  studyConfig={studyConfig}
+                  onOpenMemo={() => setIsMemoOpen(true)}
                 />
               )}
 
@@ -627,6 +702,32 @@ export function AppContent() {
           </div>
         </div>
       )}
+      {/* Memo 3D Chatbot Companion (Always available to ask doubts and configure study) */}
+      <MemoChatbot
+        isOpen={isMemoOpen}
+        onToggleOpen={() => setIsMemoOpen((prev) => !prev)}
+        currentSection={currentSection}
+        fullDocumentText={
+          cleanedDocCache?.cleanedText ||
+          (course ? course.sections.map((s) => s.content).join('\n\n') : '')
+        }
+        courseData={course}
+        studyConfig={studyConfig}
+        onUpdateStudyConfig={handleUpdateStudyConfig}
+        onNavigateToSection={(idx) => {
+          setCurrentSectionIndex(idx);
+          setActiveTab('lesson');
+        }}
+        onOpenFullSettings={() => setIsSettingsOpen(true)}
+      />
+
+      {/* Settings Modal (Theme, Pacing, Audio & About the Creator by Hamza Rashid) */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        studyConfig={studyConfig}
+        onUpdateStudyConfig={handleUpdateStudyConfig}
+      />
     </div>
   );
 }

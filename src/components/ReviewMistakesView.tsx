@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { AlertCircle, CheckCircle2, Quote, Check, X, Sparkles } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Quote, Check, X } from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import type { MistakeRecord, Question } from '../types.ts';
 
@@ -58,7 +58,7 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 pt-8 pb-36 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
       <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-5 flex flex-wrap items-center justify-between gap-3">
         <div>

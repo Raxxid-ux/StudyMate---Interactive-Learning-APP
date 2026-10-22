@@ -531,6 +531,102 @@ ${sectionContent}`;
   }
 });
 
+// STEP 6: MEMO CHATBOT - ASK DOUBTS & STUDY CONFIGURATIONS
+app.post('/api/memo-ask', async (req, res) => {
+  try {
+    const {
+      question,
+      currentSectionTitle,
+      currentSectionContent,
+      fullDocumentText,
+      chatHistory = [],
+      currentConfigs = {},
+    } = req.body;
+
+    if (!question || typeof question !== 'string') {
+      return res.status(400).json({ error: 'Question is required.' });
+    }
+
+    const memoSystemPrompt = `You are "Memo", a friendly, calm, minimalist study companion. You are visually embodied as a cute white minimal pen with a futuristic green-to-blue glowing lighting headgear.
+Your goal is to help the student learn with less stress and zero overload.
+
+CORE RULES:
+1. NO NAMES RULE: Never mention any company name, brand name, product name, or person's name in your explanations, unless the person's name is the central topic of the document. Never mention AI providers, model names, or font vendors. Use neutral terms like "your document", "this section", "study draft".
+2. GROUNDING FOR DOUBTS:
+   - When answering questions or doubts about the lesson, rely ONLY on the provided document text or current section text.
+   - Do NOT invent outside facts, examples, or theories.
+   - If the doubt cannot be answered from the document, say gently: "That isn't covered in your document, but here is what your document does say about related topics..."
+   - Include a short, direct source quote from the text when clarifying a concept whenever possible.
+3. STUDY CONFIGURATIONS:
+   - If the student asks how to configure their study environment, or asks you to adjust settings (like text size, dark/light theme, plain words mode, question types, study pace), guide them warmly.
+   - If they request a specific change (e.g. "make text bigger", "switch to dark mode", "turn on plain words", "calm pace"), include a "suggestedConfigChange" object in the JSON:
+     {
+       "key": "fontSize" | "theme" | "plainWords" | "pace" | "soundEnabled",
+       "value": any,
+       "description": "Short explanation of change"
+     }
+4. TONE: Warm, encouraging, concise, calm. Maximum 2 to 3 short paragraphs. No jargon overload.
+
+RESPONSE FORMAT (JSON ONLY):
+{
+  "answer": "string (your helpful response to the student)",
+  "sourceQuote": "exact quote from text if answering a document doubt, else empty string",
+  "suggestedConfigChange": null or { "key": string, "value": any, "description": string },
+  "suggestedFollowUps": ["short question 1", "short question 2"]
+}`;
+
+    const contextSnippet = currentSectionContent
+      ? `CURRENT SECTION: ${currentSectionTitle || 'Current Section'}\n${currentSectionContent}`
+      : fullDocumentText
+      ? `DOCUMENT EXCERPT:\n${String(fullDocumentText).slice(0, 8000)}`
+      : 'No document text loaded yet.';
+
+    const promptText = `STUDY CONFIGURATIONS CURRENT STATE:
+${JSON.stringify(currentConfigs, null, 2)}
+
+${contextSnippet}
+
+STUDENT QUESTION / DOUBT:
+${question}
+
+Provide your response in JSON according to the schema.`;
+
+    const response = await generateContentWithFallback({
+      contents: [{ role: 'user', parts: [{ text: promptText }] }],
+      config: {
+        systemInstruction: memoSystemPrompt,
+        temperature: 0.2,
+        responseMimeType: 'application/json',
+      },
+    });
+
+    let parsed: any = {};
+    try {
+      parsed = JSON.parse(response.text || '{}');
+    } catch {
+      parsed = { answer: response.text || 'I am here with you to help with your study.' };
+    }
+
+    res.json({
+      answer: parsed.answer || 'I am right here with you. What part would you like to explore together?',
+      sourceQuote: parsed.sourceQuote || '',
+      suggestedConfigChange: parsed.suggestedConfigChange || null,
+      suggestedFollowUps: parsed.suggestedFollowUps || [
+        'Can you explain this in simpler words?',
+        'What are the key points of this section?',
+        'How can I configure my study settings?',
+      ],
+    });
+  } catch (error: any) {
+    console.error('Error in /api/memo-ask:', error);
+    res.status(500).json({
+      error: error.message || 'Failed to answer doubt.',
+      answer: 'I am here with you. Let us take it one calm step at a time.',
+      suggestedFollowUps: ['Try again', 'Show key points'],
+    });
+  }
+});
+
 // Configure Vite middleware in development or static serve in production
 async function startServer() {
   const isDev = process.env.NODE_ENV !== 'production';

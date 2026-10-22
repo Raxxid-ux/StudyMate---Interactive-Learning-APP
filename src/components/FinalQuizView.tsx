@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Award, RefreshCw, Check, X, Quote, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
+import { Award, RefreshCw, Check, X, Quote, ChevronDown, ChevronUp, ArrowRight } from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import type { CourseData, Question } from '../types.ts';
 
@@ -80,7 +80,7 @@ export const FinalQuizView: React.FC<FinalQuizViewProps> = ({ course }) => {
   const score = calculateScore();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 pt-8 pb-36 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
       <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -236,12 +236,13 @@ export const FinalQuizView: React.FC<FinalQuizViewProps> = ({ course }) => {
       {!submitted && (
         <div className="pt-4 flex justify-end">
           <button
+            type="button"
             onClick={() => setSubmitted(true)}
             disabled={answeredCount === 0}
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-[#1A6EF0] text-white font-semibold hover:opacity-95 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-sm"
+            className="h-11 px-7 inline-flex items-center justify-center gap-2 rounded-xl bg-[#1A6EF0] text-white font-semibold text-sm hover:bg-[#1558C4] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-xs whitespace-nowrap"
           >
-            <span>Submit Final Quiz</span>
-            <ArrowRight className="w-4 h-4" />
+            <span className="leading-none">Submit Final Quiz</span>
+            <ArrowRight className="w-4 h-4 shrink-0" />
           </button>
         </div>
       )}

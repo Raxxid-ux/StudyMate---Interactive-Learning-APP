@@ -3,8 +3,16 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: #EDF0F5;
     color: #3A3F4F;
     line-height: 1.7;
@@ -37,16 +45,12 @@
 }
 
 .heading-gradient-animated {
-  background: linear-gradient(90deg, #2BA8F0 0%, #22D08B 50%, #7FDB22 100%);
+  background: linear-gradient(90deg, #1A6EF0 0%, #2BA8F0 25%, #22D08B 50%, #7FDB22 75%, #1A6EF0 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gradientSlide 2s ease-in-out infinite;
-}
-
-.sparkle-gradient-icon {
-  color: #22D08B;
+  animation: gradientSlide 4s ease-in-out infinite;
 }
 
 @keyframes fadeIn {

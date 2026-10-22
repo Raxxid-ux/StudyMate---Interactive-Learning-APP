@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, Sparkles, Layers } from 'lucide-react';
+import { FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, Layers } from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import type { CourseData } from '../types.ts';
 
@@ -28,7 +28,7 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
   const nothingSkipped = allSkippedItems.length === 0;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-10">
+    <div className="max-w-3xl mx-auto px-4 pt-8 pb-36 sm:px-6 lg:px-8 space-y-10">
       {/* Header */}
       <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-5 space-y-2">
         <div className="flex items-center justify-between">

@@ -26,7 +26,8 @@ export const ThemeAndTextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       const saved = localStorage.getItem('lfmd_theme');
       if (saved === 'dark' || saved === 'light') return saved;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      // Light theme is the default theme
+      return 'light';
     } catch {
       return 'light';
     }

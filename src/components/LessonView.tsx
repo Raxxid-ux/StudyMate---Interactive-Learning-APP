@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Sparkles,
   CheckCircle2,
   HelpCircle,
   ArrowLeft,
@@ -19,10 +18,12 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  BookOpen
-} from 'lucide-react';
+  BookOpen,
+  Type,
+} from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
-import type { Section, Question, QuizAnswer } from '../types.ts';
+import type { Section, Question, QuizAnswer, StudyConfiguration } from '../types.ts';
+import { playCalmChime, playSoftTap } from '../utils/audioChimes.ts';
 
 interface LessonViewProps {
   section: Section;
@@ -37,6 +38,8 @@ interface LessonViewProps {
   onAnswerQuestion: (question: Question, selectedAnswer: string) => void;
   onFetchPlainWords: (sectionIndex: number) => Promise<void>;
   isFetchingPlainWords: boolean;
+  studyConfig?: StudyConfiguration;
+  onOpenMemo?: () => void;
 }
 
 export const LessonView: React.FC<LessonViewProps> = ({
@@ -52,6 +55,8 @@ export const LessonView: React.FC<LessonViewProps> = ({
   onAnswerQuestion,
   onFetchPlainWords,
   isFetchingPlainWords,
+  studyConfig,
+  onOpenMemo,
 }) => {
   const { fontSizeClass } = useThemeAndText();
 
@@ -63,16 +68,23 @@ export const LessonView: React.FC<LessonViewProps> = ({
 
   // Reset chunk count when section changes
   useEffect(() => {
-    setVisibleChunkCount(1);
-    setShowSimplerWording(false);
+    setVisibleChunkCount(studyConfig?.studyPace === 'fast' ? (section.lesson?.chunks.length || 99) : 1);
+    const shouldShowPlain = Boolean(studyConfig?.plainWordsDefault);
+    setShowSimplerWording(shouldShowPlain);
+    if (shouldShowPlain && !section.lesson?.plainWords && !isFetchingPlainWords) {
+      onFetchPlainWords(section.sectionIndex);
+    }
     setShowOriginalText(false);
     setExpandedExplanations({});
-  }, [section.sectionIndex]);
+  }, [section.sectionIndex, studyConfig?.studyPace, studyConfig?.plainWordsDefault]);
 
   const lesson = section.lesson;
   const chunks = lesson?.chunks || [];
   const keyPoints = lesson?.keyPoints || [];
-  const sectionQuestions = lesson?.questions || [];
+  const sectionQuestions = (lesson?.questions || []).filter((q) => {
+    if (!studyConfig?.questionTypeFilter || studyConfig.questionTypeFilter === 'all') return true;
+    return q.type === studyConfig.questionTypeFilter;
+  });
   const steps = lesson?.steps || [];
   const glossary = lesson?.glossary || [];
 
@@ -80,6 +92,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
 
   const handleContinueChunk = () => {
     if (visibleChunkCount < chunks.length) {
+      playSoftTap(studyConfig?.audioFeedback);
       setVisibleChunkCount((prev) => prev + 1);
     }
   };
@@ -99,29 +112,30 @@ export const LessonView: React.FC<LessonViewProps> = ({
   };
 
   return (
-    <div data-testid="lesson-view" className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-10">
+    <div data-testid="lesson-view" className="flex-1 w-full max-w-3xl xl:max-w-4xl mx-auto px-4 pt-8 pb-32 sm:pb-36 sm:px-6 lg:px-8 space-y-10 flex flex-col justify-between">
       {/* Section Header */}
       <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-6 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#1A6EF0]/10 text-[#1A6EF0] dark:bg-[#1A6EF0]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#1A6EF0]/10 text-[#1A6EF0] dark:bg-[#1A6EF0]/20 leading-none">
               Lesson {section.sectionIndex + 1} of {totalSections}
             </span>
-            <span className="border border-zinc-400/40 text-[9px] tracking-widest font-semibold uppercase px-2 py-0.5 rounded text-zinc-500 dark:text-zinc-400">
+            <span className="border border-zinc-400/40 text-[9px] tracking-widest font-semibold uppercase px-2 py-0.5 rounded text-zinc-500 dark:text-zinc-400 leading-none">
               STUDY DRAFT
             </span>
             {isCompleted && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#A8C7FA] text-[#0A387E]">
-                <Check className="w-3 h-3" /> Finished
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#A8C7FA] text-[#0A387E] leading-none">
+                <Check className="w-3 h-3 shrink-0" /> Finished
               </span>
             )}
           </div>
 
           {/* Simpler wording button */}
           <button
+            type="button"
             onClick={handleTogglePlainWords}
             disabled={isFetchingPlainWords}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer ${
+            className={`h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
               showSimplerWording
                 ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700'
                 : 'bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/60'
@@ -129,11 +143,11 @@ export const LessonView: React.FC<LessonViewProps> = ({
             title="Read simpler wording without outside facts"
           >
             {isFetchingPlainWords ? (
-              <RefreshCw className="w-4 h-4 animate-spin text-amber-600" />
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600 shrink-0" />
             ) : (
-              <Sparkles className="w-4 h-4 text-amber-500" />
+              <Type className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             )}
-            <span>{showSimplerWording ? 'View Study Chunks' : 'Plain words'}</span>
+            <span className="leading-none">{showSimplerWording ? 'View Study Chunks' : 'Plain words'}</span>
           </button>
         </div>
 
@@ -152,7 +166,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
       {showSimplerWording && (
         <div className="p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 space-y-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <FileText className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-200">
               Simpler wording
             </span>
@@ -192,11 +206,12 @@ export const LessonView: React.FC<LessonViewProps> = ({
           {!allChunksRevealed && (
             <div className="pt-2 flex justify-center">
               <button
+                type="button"
                 onClick={handleContinueChunk}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1A6EF0] text-white font-semibold hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-sm text-sm"
+                className="h-11 px-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#1A6EF0] text-white font-semibold text-sm hover:bg-[#1558C4] active:scale-[0.99] transition-all cursor-pointer shadow-xs whitespace-nowrap"
               >
-                <span>Continue</span>
-                <ArrowRight className="w-4 h-4" />
+                <span className="leading-none">Continue</span>
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </button>
             </div>
           )}
@@ -303,7 +318,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
                 <span>Check yourself</span>
               </h3>
               <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] mt-0.5">
-                Instant feedback. Learning is the priority—answers and quotes are grounded directly in the text.
+                Instant feedback. Learning is the priority: answers and quotes are grounded directly in the text.
               </p>
             </div>
             <span className="border border-zinc-400/40 text-[9px] uppercase tracking-wider px-2 py-0.5 rounded text-zinc-500">
@@ -447,37 +462,42 @@ export const LessonView: React.FC<LessonViewProps> = ({
         )}
       </section>
 
-      {/* Bottom Navigation: Previous, Next, Mark Done */}
-      <div className="pt-6 border-t border-zinc-200/80 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
+      {/* Bottom Navigation: Previous, Next, Mark Done with pristine alignment */}
+      <div className="pt-8 border-t border-zinc-200/80 dark:border-zinc-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+        {/* Previous Lesson Button */}
         <button
+          type="button"
           onClick={onPreviousSection}
           disabled={!hasPrevious}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-[#3A3F4F] dark:text-[#F1F3F7] font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+          className="h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] text-xs sm:text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer whitespace-nowrap shadow-2xs"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Previous Lesson</span>
+          <ArrowLeft className="w-4 h-4 shrink-0" />
+          <span className="leading-none">Previous Lesson</span>
         </button>
 
-        <div className="flex items-center gap-3">
+        {/* Action Pair: Mark Done & Next Lesson */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <button
+            type="button"
             onClick={() => onMarkSectionCompleted(section.sectionIndex)}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer ${
+            className={`h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
               isCompleted
-                ? 'bg-[#A8C7FA] text-[#0A387E]'
-                : 'bg-zinc-200 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-300 dark:hover:bg-zinc-700'
+                ? 'bg-[#A8C7FA] text-[#0A387E] hover:bg-[#96befa]'
+                : 'bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700'
             }`}
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>{isCompleted ? 'Finished Lesson' : 'Mark Lesson Done'}</span>
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span className="leading-none">{isCompleted ? 'Finished Lesson' : 'Mark Lesson Done'}</span>
           </button>
 
           <button
+            type="button"
             onClick={onNextSection}
             disabled={!hasNext}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1A6EF0] text-white font-semibold hover:opacity-95 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm cursor-pointer"
+            className="h-11 px-5 inline-flex items-center justify-center gap-2 rounded-xl bg-[#1A6EF0] text-white text-xs sm:text-sm font-semibold hover:bg-[#1558C4] disabled:opacity-30 disabled:pointer-events-none transition-all shadow-xs cursor-pointer whitespace-nowrap"
           >
-            <span>Next Lesson</span>
-            <ArrowRight className="w-4 h-4" />
+            <span className="leading-none">Next Lesson</span>
+            <ArrowRight className="w-4 h-4 shrink-0" />
           </button>
         </div>
       </div>

@@ -4,9 +4,10 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, ArrowRight, RefreshCw, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
+import { Upload, FileText, ArrowRight, RefreshCw, AlertCircle, CheckCircle2, Sliders, Settings } from './icons.tsx';
 import { SAMPLE_DOCUMENTS, type SampleDoc } from '../sampleDocuments.ts';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
+import { MemoThreeCanvas } from './MemoThreeCanvas.tsx';
 
 interface UploadScreenProps {
   onStartCourse: (docData: {
@@ -19,6 +20,8 @@ interface UploadScreenProps {
   progressStep: string;
   errorMessage: string | null;
   onRetry: () => void;
+  onOpenMemo?: () => void;
+  onOpenSettings?: () => void;
 }
 
 export const UploadScreen: React.FC<UploadScreenProps> = ({
@@ -27,6 +30,8 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
   progressStep,
   errorMessage,
   onRetry,
+  onOpenMemo,
+  onOpenSettings,
 }) => {
   const { fontSizeClass } = useThemeAndText();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -108,39 +113,40 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
       data-testid="upload-screen"
       className="min-h-[calc(100vh-4.5rem)] flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8"
     >
-      <div className="w-full max-w-2xl mx-auto space-y-10">
-        {/* Intro Heading with giant light-weight title and gradient on one word */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-zinc-400/40 text-[10px] tracking-widest font-semibold uppercase text-zinc-500 dark:text-zinc-400">
-            <Sparkles className="w-3 h-3 sparkle-gradient-icon" />
-            <span>STUDY DRAFT</span>
+      <div className="w-full max-w-3xl mx-auto space-y-10">
+        {/* Intro Heading with normal font, animated gradient on Greetings, and subheading */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center px-3 py-1 rounded-full border border-[#1A6EF0]/30 bg-[#1A6EF0]/5 text-[10px] tracking-widest font-bold uppercase text-[#1A6EF0] dark:text-[#64B5F6]">
+            <span>STUDYMATE · INTERACTIVE LEARNING</span>
           </div>
 
-          <h1 className="text-5xl sm:text-7xl lg:text-[96px] font-light text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight leading-none">
-            Learn From Your{' '}
-            <span
-              className={
-                isProcessing
-                  ? 'heading-gradient-animated font-normal'
-                  : 'heading-gradient font-normal'
-              }
-            >
-              Document
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-normal tracking-tight leading-tight">
+            <span className="heading-gradient-animated inline-block font-normal">
+              Greetings,
             </span>
           </h1>
 
-          <p className="text-[#5F6573] dark:text-[#A6ACB9] text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-            Turn any document into a short, calm, easy study course.
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight leading-snug">
+            What would you like to learn today?
+          </h2>
+
+          <p className="text-[#5F6573] dark:text-[#A6ACB9] text-base sm:text-lg max-w-md mx-auto leading-relaxed pt-1">
+            StudyMate turns any document into a short, calm, easy study course with Memo, your 3D interactive companion.
           </p>
         </div>
 
         {/* Upload Box Container */}
         <div className="bg-[#F9FAFC] dark:bg-[#1A1E27] rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-[0_4px_24px_rgba(0,0,0,0.03)] p-6 sm:p-10 space-y-6">
-          {/* Processing State */}
+          {/* Processing State with live 3D Memo */}
           {isProcessing ? (
-            <div className="py-12 px-4 text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#1A6EF0]/10 text-[#1A6EF0] dark:bg-[#1A6EF0]/20">
-                <RefreshCw className="w-8 h-8 animate-spin" />
+            <div className="py-8 px-4 text-center space-y-4">
+              <div className="w-48 h-48 mx-auto flex items-center justify-center relative">
+                <MemoThreeCanvas
+                  size="medium"
+                  mood="thinking"
+                  interactive={true}
+                  soundEnabled={false}
+                />
               </div>
 
               <div className="space-y-2">
@@ -296,7 +302,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                       .{sample.extension}
                     </span>
-                    <Sparkles className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#22D08B] transition-colors" />
+                    <FileText className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#1A6EF0] transition-colors" />
                   </div>
                   <h4 className="text-xs sm:text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] line-clamp-1 group-hover:text-[#1A6EF0] transition-colors">
                     {sample.name}
@@ -306,6 +312,53 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                   </p>
                 </button>
               ))}
+            </div>
+
+            {/* Meet Memo 3D Study Companion Card */}
+            <div className="mt-6 p-5 rounded-3xl bg-white/70 dark:bg-[#1A1E27]/70 border border-zinc-200/80 dark:border-zinc-800 shadow-xs backdrop-blur-xs flex flex-col sm:flex-row items-center gap-4 transition-all hover:border-[#22D08B]/60">
+              <div className="w-20 h-20 shrink-0 flex items-center justify-center">
+                <MemoThreeCanvas
+                  size="compact"
+                  mood="idle"
+                  interactive={true}
+                  soundEnabled={true}
+                />
+              </div>
+
+              <div className="space-y-1 text-center sm:text-left flex-1">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <h4 className="font-semibold text-sm text-[#3A3F4F] dark:text-[#F1F3F7]">
+                    Meet Memo · 3D Study Companion
+                  </h4>
+                  <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse" />
+                </div>
+                <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                  A cute minimal white pen with futuristic green-to-blue lighting. Ask doubts anytime grounded strictly in your document, and configure your text size, theme, and calm study pace.
+                </p>
+              </div>
+
+              <div className="flex sm:flex-col gap-2 shrink-0">
+                {onOpenMemo && (
+                  <button
+                    type="button"
+                    onClick={onOpenMemo}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#1A6EF0] hover:bg-[#1558C4] text-white transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Sliders className="w-3.5 h-3.5" />
+                    <span>Ask Memo</span>
+                  </button>
+                )}
+                {onOpenSettings && (
+                  <button
+                    type="button"
+                    onClick={onOpenSettings}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border border-zinc-200 dark:border-zinc-700 hover:border-[#1A6EF0] transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-zinc-500" />
+                    <span>Settings</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
