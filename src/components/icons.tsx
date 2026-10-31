@@ -395,3 +395,216 @@ export const ExternalLink: React.FC<IconProps> = ({ className, size, ...rest }) 
     <path d="M10 14L21 3" />
   </svg>
 );
+
+export const Lock: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <rect x="4" y="11" width="16" height="10" rx="2.5" />
+    <path d="M7 11V7C7 4.24 9.24 2 12 2C14.76 2 17 4.24 17 7V11" />
+    <circle cx="12" cy="16" r="1.25" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const Unlock: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <rect x="4" y="11" width="16" height="10" rx="2.5" />
+    <path d="M7 11V7C7 4.24 9.24 2 12 2C14.76 2 17 4.24 17 7" />
+    <circle cx="12" cy="16" r="1.25" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const Key: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <circle cx="8" cy="15" r="5" />
+    <path d="M11.5 11.5L21.5 1.5" />
+    <path d="M16 4L18.5 6.5" />
+    <path d="M19 7L21.5 9.5" />
+  </svg>
+);
+
+export const MessageCircle: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M21 11.5C21.003 12.81 20.695 14.1 20.1 15.25C19.34 16.73 18.15 17.94 16.68 18.72C15.21 19.5 13.52 19.82 11.87 19.64C10.22 19.46 8.67 18.79 7.43 17.72L3 19L4.28 14.57C3.21 13.33 2.54 11.78 2.36 10.13C2.18 8.48 2.5 6.79 3.28 5.32C4.06 3.85 5.27 2.66 6.75 1.9C7.9 1.305 9.19 0.997 10.5 1H11.5C14.08 1.2 16.52 2.29 18.3 4.07C20.08 5.85 21.17 8.29 21.37 10.87L21 11.5Z" />
+  </svg>
+);
+
+export const Star: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+export const Trash2: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M3 6H21" />
+    <path d="M19 6V20C19 21.1 18.1 22 17 22H7C5.9 22 5 21.1 5 20V6" />
+    <path d="M8 6V4C8 2.9 8.9 2 10 2H14C15.1 2 16 2.9 16 4V6" />
+    <line x1="10" y1="11" x2="10" y2="17" />
+    <line x1="14" y1="11" x2="14" y2="17" />
+  </svg>
+);
+
+export const Eye: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+export const Download: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
+export const Users: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" />
+    <circle cx="12" cy="11" r="4" />
+    <path d="M22 21V19C21.99 18.06 21.36 17.24 20.44 17.03" />
+    <path d="M16 7.13C16.86 7.35 17.58 7.97 17.9 8.8" />
+  </svg>
+);
+
+export const BarChart3: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+);
+
+export const FilePlus: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="12" y1="18" x2="12" y2="12" />
+    <line x1="9" y1="15" x2="15" y2="15" />
+  </svg>
+);
+
+export const Search: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+export const Timer: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <line x1="10" y1="2" x2="14" y2="2" />
+    <line x1="12" y1="14" x2="15" y2="11" />
+    <circle cx="12" cy="14" r="8" />
+  </svg>
+);
+
+export const Zap: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
+export const Play: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <polygon points="5 3 19 12 5 21 5 3" />
+  </svg>
+);
+
+export const Pause: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <rect x="6" y="4" width="4" height="16" />
+    <rect x="14" y="4" width="4" height="16" />
+  </svg>
+);
+
+export const EyeOff: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
+export const Printer: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <polyline points="6 9 6 2 18 2 18 9" />
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+    <rect x="6" y="14" width="12" height="8" />
+  </svg>
+);
+
+export const Activity: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+  </svg>
+);
+
+export const WitchHat: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M2 19C5 18 8 17.5 12 17.5C16 17.5 19 18 22 19" />
+    <path d="M12 3L6 17.5H18L12 3Z" />
+    <path d="M7.5 14H16.5" />
+    <rect x="10.5" y="12.5" width="3" height="3" rx="0.5" />
+  </svg>
+);
+
+export const VampireFangs: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M3 8C6 11 18 11 21 8" />
+    <path d="M6.5 8L8 14L9.5 8" fill="currentColor" />
+    <path d="M14.5 8L16 14L17.5 8" fill="currentColor" />
+  </svg>
+);
+
+export const Flame: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M8.5 14.5A3.5 3.5 0 0 0 12 18A3.5 3.5 0 0 0 15.5 14.5C15.5 12 13.5 10 12 8C10.5 10 8.5 12 8.5 14.5Z" />
+    <path d="M12 2C8 6 6 10 6 14A6 6 0 0 0 18 14C18 10 16 6 12 2Z" />
+  </svg>
+);
+
+export const Calendar: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+export const Clock: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+export const Music: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M9 18V5L21 3V16" />
+    <circle cx="6" cy="18" r="3" />
+    <circle cx="18" cy="16" r="3" />
+  </svg>
+);
+
+export const Headphones: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M3 18V12A9 9 0 0 1 21 12V18" />
+    <path d="M2 17C2 15.9 2.9 15 4 15H5C6.1 15 7 15.9 7 17V20C7 21.1 6.1 22 5 22H4C2.9 22 2 21.1 2 20V17Z" />
+    <path d="M17 17C17 15.9 17.9 15 19 15H20C21.1 15 22 15.9 22 17V20C22 21.1 21.1 22 20 22H19C17.9 22 17 21.1 17 20V17Z" />
+  </svg>
+);
+
+export const Coffee: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M18 8H19A3 3 0 0 1 22 11V11A3 3 0 0 1 19 14H18" />
+    <path d="M2 8H18V16A4 4 0 0 1 14 20H6A4 4 0 0 1 2 16V8Z" />
+    <line x1="6" y1="2" x2="6" y2="4" />
+    <line x1="10" y1="2" x2="10" y2="4" />
+    <line x1="14" y1="2" x2="14" y2="4" />
+  </svg>
+);
+
+
+
+

@@ -22,8 +22,11 @@ import {
   Lightbulb,
   RotateCcw,
   BookOpen,
+  WitchHat,
+  VampireFangs,
 } from './icons.tsx';
-import { MemoThreeCanvas, MemoMood } from './MemoThreeCanvas';
+import { MemoThreeCanvas, MemoMood, MemoColorPreset } from './MemoThreeCanvas';
+import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import { Section, CourseData, StudyConfiguration, MemoChatMessage } from '../types';
 import { playCalmChime, playSoftTap, playMemoGreeting } from '../utils/audioChimes';
 
@@ -50,6 +53,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
   onToggleOpen,
   onOpenFullSettings,
 }) => {
+  const { memoHalloweenTheme, toggleMemoHalloweenTheme } = useThemeAndText();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isOpen = propIsOpen !== undefined ? propIsOpen : internalIsOpen;
 
@@ -58,7 +62,9 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
   const [inputMessage, setInputMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [memoMood, setMemoMood] = useState<MemoMood>('idle');
-  const [colorPreset, setColorPreset] = useState<'aurora' | 'cyan' | 'lime' | 'twilight'>('aurora');
+  const [colorPreset, setColorPreset] = useState<MemoColorPreset>(
+    memoHalloweenTheme ? 'halloween' : 'aurora'
+  );
 
   // Messages list with a friendly initial message
   const [messages, setMessages] = useState<MemoChatMessage[]>([
@@ -250,7 +256,13 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
             title="Chat with Memo"
           >
             {/* Glowing gradient aura backdrop */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#2BA8F0]/15 via-[#22D08B]/20 to-[#7FDB22]/20 animate-pulse" />
+            <div
+              className={`absolute inset-0 transition-colors ${
+                memoHalloweenTheme
+                  ? 'bg-gradient-to-tr from-[#FF6B00]/25 via-[#9D4EDD]/25 to-[#FF7700]/20 animate-pulse'
+                  : 'bg-gradient-to-tr from-[#2BA8F0]/15 via-[#22D08B]/20 to-[#7FDB22]/20 animate-pulse'
+              }`}
+            />
 
             {/* Live miniature 3D Memo in the button */}
             <div className="w-12 h-12 pointer-events-none">
@@ -259,6 +271,8 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                 mood={memoMood}
                 interactive={false}
                 soundEnabled={false}
+                customColorPreset={memoHalloweenTheme ? 'halloween' : colorPreset}
+                halloweenTheme={memoHalloweenTheme}
               />
             </div>
           </button>
@@ -270,58 +284,78 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
         <div
           className={`fixed z-50 transition-all duration-300 ease-out flex flex-col bg-white dark:bg-[#1e2330] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden ${
             isExpanded
-              ? 'inset-4 md:inset-10'
-              : 'bottom-4 right-4 md:bottom-6 md:right-6 w-[94vw] md:w-[460px] h-[640px] max-h-[88vh]'
+              ? 'inset-3 sm:inset-6 md:inset-10'
+              : 'bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 w-[calc(100vw-24px)] sm:w-[440px] md:w-[460px] max-w-[460px] h-[640px] max-h-[90vh]'
           }`}
         >
           {/* TOP BAR / CHARACTER HEADER */}
-          <div className="relative px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 via-white to-[#F0FDF4] dark:from-[#181d28] dark:via-[#1e2330] dark:to-[#16251f] flex items-center justify-between">
+          <div className="relative px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 via-white to-[#F0FDF4] dark:from-[#181d28] dark:via-[#1e2330] dark:to-[#16251f] flex items-center justify-between gap-2 shrink-0">
             {/* Memo Avatar & Title */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
               <div
                 onClick={() => {
                   setMemoMood('happy');
                   playCalmChime(studyConfig.audioFeedback);
                   setTimeout(() => setMemoMood('idle'), 2500);
                 }}
-                className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#22D08B]/40 transition-all flex items-center justify-center relative"
+                className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border overflow-hidden cursor-pointer transition-all flex items-center justify-center relative shrink-0 ${
+                  memoHalloweenTheme
+                    ? 'border-orange-400 dark:border-orange-500 hover:ring-2 hover:ring-orange-400/40'
+                    : 'border-slate-200 dark:border-slate-700/60 hover:ring-2 hover:ring-[#22D08B]/40'
+                }`}
                 title="Tap Memo to emote!"
               >
-                <div className="w-14 h-14">
+                <div className="w-12 h-12">
                   <MemoThreeCanvas
                     size="compact"
                     mood={memoMood}
                     interactive={false}
                     soundEnabled={studyConfig.audioFeedback}
-                    customColorPreset={colorPreset}
+                    customColorPreset={memoHalloweenTheme ? 'halloween' : colorPreset}
+                    halloweenTheme={memoHalloweenTheme}
                   />
                 </div>
               </div>
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-base text-[#3A3F4F] dark:text-slate-100">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h3 className="font-semibold text-sm sm:text-base text-[#3A3F4F] dark:text-slate-100 leading-tight">
                     Memo
                   </h3>
-                  <span className="text-[10px] tracking-wider font-semibold uppercase px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400">
-                    STUDY DRAFT
-                  </span>
-                  <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse" />
+                  {memoHalloweenTheme ? (
+                    <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border border-orange-400 bg-orange-100/80 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300">
+                      HALLOWEEN
+                    </span>
+                  ) : (
+                    <span className="text-[9px] tracking-wider font-semibold uppercase px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                      STUDY DRAFT
+                    </span>
+                  )}
+                  <span
+                    className={`w-2 h-2 rounded-full animate-pulse shrink-0 ${
+                      memoHalloweenTheme ? 'bg-[#FF6B00]' : 'bg-[#22D08B]'
+                    }`}
+                  />
                 </div>
-                <p className="text-xs text-[#5F6573] dark:text-slate-400 truncate max-w-[210px]">
-                  {currentSection ? currentSection.title : 'Ready to clear doubts & help you configure'}
+                <p className="text-xs text-[#5F6573] dark:text-slate-400 truncate">
+                  {memoHalloweenTheme
+                    ? 'Witch Hat & Vampire Teeth Active'
+                    : currentSection
+                    ? currentSection.title
+                    : 'Ready to clear doubts & help you configure'}
                 </p>
               </div>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-1.5">
+            {/* Action buttons on the right - cleanly aligned, cannot overflow */}
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={() =>
                   onUpdateStudyConfig({ audioFeedback: !studyConfig.audioFeedback })
                 }
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
                 title={studyConfig.audioFeedback ? 'Mute chimes' : 'Enable chimes'}
+                aria-label="Toggle chimes"
               >
                 {studyConfig.audioFeedback ? (
                   <Volume2 className="w-4 h-4 text-[#22D08B]" />
@@ -332,8 +366,9 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden sm:block"
+                className="w-8 h-8 items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden sm:flex cursor-pointer shrink-0"
                 title={isExpanded ? 'Restore window size' : 'Expand window'}
+                aria-label="Expand or restore window"
               >
                 {isExpanded ? (
                   <Minimize2 className="w-4 h-4" />
@@ -344,22 +379,23 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
               <button
                 onClick={toggleOpen}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 transition-colors cursor-pointer shrink-0 shadow-2xs"
                 title="Close Memo"
+                aria-label="Close Memo"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 stroke-[2.2]" />
               </button>
             </div>
           </div>
 
           {/* TAB SELECTOR */}
-          <div className="px-5 pt-2 pb-2 bg-white dark:bg-[#1e2330] border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+          <div className="px-3 sm:px-4 pt-2 pb-2 bg-white dark:bg-[#1e2330] border-b border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto shrink-0">
             <button
               onClick={() => {
                 setActiveTab('doubts');
                 playSoftTap(studyConfig.audioFeedback);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                 activeTab === 'doubts'
                   ? 'bg-[#1A6EF0] text-white shadow-sm'
                   : 'text-[#5F6573] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -374,14 +410,14 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                 setActiveTab('config');
                 playSoftTap(studyConfig.audioFeedback);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                 activeTab === 'config'
                   ? 'bg-[#1A6EF0] text-white shadow-sm'
                   : 'text-[#5F6573] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
-              <span>Study Configurations</span>
+              <span>Configurations</span>
             </button>
 
             <button
@@ -389,14 +425,17 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                 setActiveTab('playground');
                 playSoftTap(studyConfig.audioFeedback);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                 activeTab === 'playground'
                   ? 'bg-[#1A6EF0] text-white shadow-sm'
                   : 'text-[#5F6573] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <Box className="w-3.5 h-3.5 shrink-0" />
-              <span>3D Playground</span>
+              <span>Memo Customize</span>
+              {memoHalloweenTheme && (
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+              )}
             </button>
           </div>
 
@@ -715,21 +754,20 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
             </div>
           )}
 
-          {/* TAB CONTENT 3: 3D PLAYGROUND */}
+          {/* TAB CONTENT 3: MEMO CUSTOMIZE & 3D */}
           {activeTab === 'playground' && (
-            <div className="flex-1 flex flex-col p-6 bg-[#F9FAFC] dark:bg-[#171b24] overflow-y-auto items-center">
-              <div className="text-center mb-2">
+            <div className="flex-1 flex flex-col p-4 sm:p-5 bg-[#F9FAFC] dark:bg-[#171b24] overflow-y-auto items-center space-y-3.5">
+              <div className="text-center shrink-0">
                 <h4 className="font-semibold text-sm text-[#3A3F4F] dark:text-slate-200">
-                  Interactive 3D Experience
+                  Memo Customization & 3D Model
                 </h4>
-                <p className="text-xs text-[#5F6573] dark:text-slate-400">
-                  Move your mouse or tap Memo to see physics tilt, spins, and glowing headgear
-                  lighting.
+                <p className="text-xs text-[#5F6573] dark:text-slate-400 max-w-xs mx-auto">
+                  Move your mouse or tap Memo to see physics tilt, spins, and custom outfit accessories.
                 </p>
               </div>
 
-              {/* 3D Canvas Showcase */}
-              <div className="w-full max-w-xs h-64 relative bg-white/70 dark:bg-[#1f2535] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-inner flex items-center justify-center my-2">
+              {/* 3D Canvas Showcase - Protected against flex shrink with explicit min-height */}
+              <div className="w-full max-w-[280px] sm:max-w-xs h-64 shrink-0 min-h-[256px] relative bg-gradient-to-b from-slate-100 via-slate-50 to-slate-200/50 dark:from-[#1b212f] dark:via-[#161a25] dark:to-[#12161f] rounded-3xl border border-slate-300 dark:border-slate-700/80 shadow-md flex items-center justify-center overflow-hidden">
                 <MemoThreeCanvas
                   size="large"
                   mood={memoMood}
@@ -737,60 +775,144 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                   showControlsOverlay={true}
                   soundEnabled={studyConfig.audioFeedback}
                   customColorPreset={colorPreset}
+                  halloweenTheme={memoHalloweenTheme}
+                  className="w-full h-full"
                 />
               </div>
 
-              {/* Interactive Emotes Trigger Buttons */}
-              <div className="w-full max-w-xs space-y-3 mt-2">
-                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Emote & React
+              {/* Halloween Special Outfit Card */}
+              <div className="w-full max-w-[280px] sm:max-w-xs p-3.5 rounded-2xl bg-gradient-to-br from-purple-900/15 via-orange-950/20 to-purple-950/25 border border-orange-400/50 dark:border-orange-500/40 flex items-center justify-between gap-3 shadow-xs shrink-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+                    <WitchHat className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 flex-wrap">
+                      <span>Halloween Theme</span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-orange-500 text-white uppercase tracking-wider">
+                        Special
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-zinc-600 dark:text-zinc-400 truncate">
+                      Witch Hat, Vampire Teeth & Spooky Glow
+                    </p>
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleMemoHalloweenTheme();
+                    if (!memoHalloweenTheme) {
+                      setColorPreset('halloween');
+                    }
+                    playCalmChime(studyConfig.audioFeedback);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                    memoHalloweenTheme
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-xs'
+                      : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-300 dark:hover:bg-zinc-600'
+                  }`}
+                >
+                  {memoHalloweenTheme ? 'Equipped' : 'Equip'}
+                </button>
+              </div>
+
+              {/* Interactive Emotes Trigger Buttons */}
+              <div className="w-full max-w-[280px] sm:max-w-xs space-y-2 shrink-0">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Emote & React (Animations)
+                </div>
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                  <button
+                    onClick={() => {
+                      setMemoMood('scholar');
+                      setColorPreset('scholar-gold');
+                      playCalmChime(studyConfig.audioFeedback);
+                    }}
+                    className="py-1.5 px-1.5 bg-[#FAF6EE] dark:bg-[#2A231B] rounded-xl border border-[#D4AF37]/60 text-xs text-[#8C6239] dark:text-[#E6C687] font-semibold hover:border-[#D4AF37] transition-colors cursor-pointer text-center"
+                    title="Scholar Spectacles & Studious Reading"
+                  >
+                    Scholar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMemoMood('celebrate');
+                      playCalmChime(studyConfig.audioFeedback);
+                    }}
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-amber-300 dark:border-amber-700 text-xs text-amber-700 dark:text-amber-300 font-semibold hover:border-amber-500 transition-colors cursor-pointer text-center"
+                    title="Victory Spin & Joyful Flip"
+                  >
+                    Celebrate
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMemoMood('cheer');
+                      playCalmChime(studyConfig.audioFeedback);
+                    }}
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-emerald-600 dark:text-emerald-400 hover:border-emerald-400 transition-colors cursor-pointer text-center"
+                    title="Wave & Cheer"
+                  >
+                    Cheer
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMemoMood('focus');
+                      playSoftTap(studyConfig.audioFeedback);
+                    }}
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-blue-600 dark:text-blue-400 hover:border-blue-400 transition-colors cursor-pointer text-center"
+                    title="Deep Focus Breathing Wave"
+                  >
+                    Deep Focus
+                  </button>
                   <button
                     onClick={() => {
                       setMemoMood('happy');
                       playCalmChime(studyConfig.audioFeedback);
                     }}
-                    className="py-1.5 px-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-[#22D08B] hover:text-[#22D08B] transition-colors"
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-[#22D08B] hover:text-[#22D08B] transition-colors cursor-pointer text-center"
                   >
-                    Happy Visor
+                    Happy
                   </button>
                   <button
                     onClick={() => {
                       setMemoMood('thinking');
                       playSoftTap(studyConfig.audioFeedback);
                     }}
-                    className="py-1.5 px-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-[#2BA8F0] hover:text-[#2BA8F0] transition-colors"
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-[#2BA8F0] hover:text-[#2BA8F0] transition-colors cursor-pointer text-center"
                   >
                     Thinking
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMemoMood('idle');
-                    }}
-                    className="py-1.5 px-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-slate-400 transition-colors"
-                  >
-                    Resting
                   </button>
                 </div>
 
                 {/* Futuristic Lighting Color Presets */}
                 <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 pt-2">
-                  Futuristic Lighting Theme
+                  Lighting & Aura Theme
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                   {[
+                    { id: 'scholar-gold', label: 'Scholar' },
+                    { id: 'halloween', label: 'Spooky' },
                     { id: 'aurora', label: 'Aurora' },
-                    { id: 'cyan', label: 'Cyber Cyan' },
-                    { id: 'lime', label: 'Neon Lime' },
+                    { id: 'cyan', label: 'Cyan' },
+                    { id: 'lime', label: 'Lime' },
                   ].map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => setColorPreset(p.id as any)}
-                      className={`py-1.5 px-2 rounded-xl border text-xs font-medium transition-all ${
+                      onClick={() => {
+                        setColorPreset(p.id as any);
+                        if (p.id === 'halloween' && !memoHalloweenTheme) {
+                          toggleMemoHalloweenTheme();
+                        }
+                      }}
+                      className={`py-1.5 px-1 rounded-xl border text-[11px] font-medium transition-all cursor-pointer text-center ${
                         colorPreset === p.id
-                          ? 'border-[#22D08B] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                          ? p.id === 'scholar-gold'
+                            ? 'border-[#D4AF37] bg-amber-50 dark:bg-amber-950/40 text-[#8C6239] dark:text-[#E6C687] font-semibold'
+                            : p.id === 'halloween'
+                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 font-semibold'
+                            : 'border-[#22D08B] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-400'
                       }`}
                     >
                       {p.label}

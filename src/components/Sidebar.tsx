@@ -27,6 +27,7 @@ import {
 } from './icons.tsx';
 import type { CourseData } from '../types.ts';
 import { MemoThreeCanvas } from './MemoThreeCanvas.tsx';
+import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 
 interface SidebarProps {
   course: CourseData;
@@ -49,6 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOnly = false,
   desktopOnly = false,
 }) => {
+  const { memoHalloweenTheme } = useThemeAndText();
   const [mobileExpanded, setMobileExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'sections' | 'memo' | 'notes'>('sections');
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -492,13 +494,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="w-full h-full"
                   size="medium"
                   soundEnabled={true}
+                  halloweenTheme={memoHalloweenTheme}
                 />
               </div>
 
               <div className="space-y-0.5">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Interactive 3D Stylus</span>
+                <div
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    memoHalloweenTheme
+                      ? 'bg-orange-100 dark:bg-orange-950/50 text-orange-800 dark:text-orange-300'
+                      : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                      memoHalloweenTheme ? 'bg-[#FF6B00]' : 'bg-emerald-500'
+                    }`}
+                  />
+                  <span>
+                    {memoHalloweenTheme
+                      ? 'Halloween Witch Hat & Fangs Active'
+                      : 'Interactive 3D Stylus'}
+                  </span>
                 </div>
                 <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
                   Memo Companion

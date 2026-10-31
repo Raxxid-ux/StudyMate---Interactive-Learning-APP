@@ -16,12 +16,118 @@
     background-color: #EDF0F5;
     color: #3A3F4F;
     line-height: 1.7;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .dark body {
     background-color: #12151B;
     color: #F1F3F7;
   }
+
+  /* THEME 1: MEADOW SAGE (Benchmark theme - soft, calm, optimistic, airy, safe, refined) */
+  html[data-theme="meadow"] body {
+    background-color: #F3F7F3;
+    color: #213327;
+  }
+  html[data-theme="meadow"].dark body {
+    background-color: #0F1712;
+    color: #ECFDF5;
+  }
+
+  /* THEME 2: AURORA DAYLIGHT */
+  html[data-theme="aurora"] body {
+    background-color: #F8FAFC;
+    color: #1E293B;
+  }
+  html[data-theme="aurora"].dark body {
+    background-color: #0F172A;
+    color: #F8FAFC;
+  }
+
+  /* THEME 3: COSMIC MIDNIGHT */
+  html[data-theme="cosmic"] body {
+    background-color: #0C1017;
+    color: #F1F5F9;
+  }
+
+  /* THEME 4: SEPIA WARM PAPER (Zero Blue Light, Anti-Glare) */
+  html[data-theme="sepia"] body {
+    background-color: #FBF7EE;
+    color: #362B20;
+  }
+  html[data-theme="sepia"].dark body {
+    background-color: #1F1912;
+    color: #F5EADB;
+  }
+
+  /* THEME 5: HIGH CONTRAST FOCUS (Maximum Legibility, Zero Distraction) */
+  html[data-theme="high-contrast"] body {
+    background-color: #050505;
+    color: #FFFFFF;
+  }
+
+  /* THEME 6: DARK ACADEMIA (Warm scholar parchment, deep antique wood, gold/brass accents, classic serif titles) */
+  html[data-theme="academia"] body {
+    background-color: #F7F4EC;
+    color: #2D251E;
+  }
+  html[data-theme="academia"].dark body {
+    background-color: #191512;
+    color: #F2E8DC;
+  }
+
+  html[data-theme="academia"] .font-serif-scholar,
+  html[data-theme="academia"] h1,
+  html[data-theme="academia"] h2,
+  html[data-theme="academia"] .scholar-serif {
+    font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
+  }
+}
+
+/* Dyslexia-Friendly Typography (Lexend with weighted bottom-heavy tracking) */
+.font-dyslexic,
+.font-dyslexic * {
+  font-family: 'Lexend', system-ui, -apple-system, sans-serif !important;
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.85 !important;
+}
+
+/* Bionic Reading Word Anchor (Bolds the initial recognition phonemes) */
+.bionic-lead {
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+.bionic-tail {
+  font-weight: 400 !important;
+  opacity: 0.9 !important;
+}
+
+/* ADHD Single-Chunk Low-Stimulus Mode */
+.single-chunk-dimmed {
+  opacity: 0.25;
+  filter: blur(1.5px);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.single-chunk-dimmed:hover {
+  opacity: 0.6;
+  filter: blur(0px);
+}
+
+/* Reading Ruler Mask (Focus Line across reading area) */
+.reading-ruler-guide {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 48px;
+  pointer-events: none;
+  z-index: 45;
+  background: rgba(34, 197, 94, 0.08);
+  border-top: 2px solid rgba(34, 197, 94, 0.35);
+  border-bottom: 2px solid rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.1);
+  transition: top 0.08s ease-out;
 }
 
 @keyframes gradientSlide {

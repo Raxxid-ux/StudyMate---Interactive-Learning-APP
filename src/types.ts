@@ -111,3 +111,53 @@ export interface MemoChatMessage {
   suggestedFollowUps?: string[];
 }
 
+export interface UploadedFileItem {
+  fileName: string;
+  fileType: string;
+  fileSize?: number;
+  documentText?: string;
+  pdfBase64?: string;
+}
+
+export interface UploadLogRecord {
+  id: string;
+  documentTitle: string;
+  fileNames: string[];
+  fileTypes: string[];
+  totalSize: number;
+  totalWordsEstimate?: number;
+  sectionCount: number;
+  uploadedAt: string;
+  userId: string;
+  userEmail: string;
+  contentSnippet: string;
+  fullCleanedText?: string;
+  skippedItems?: string[];
+}
+
+export interface FeedbackRecord {
+  id: string;
+  rating: number; // 1 to 5
+  sentiment: 'loved' | 'great' | 'good' | 'okay' | 'confusing';
+  category: 'feature' | 'quality' | 'pacing' | 'design' | 'bug' | 'other';
+  message: string;
+  userEmail?: string;
+  userName?: string;
+  submittedAt: string;
+  status: 'new' | 'reviewed';
+}
+
+export interface UserSessionRecord {
+  id: string;
+  email: string;
+  name: string;
+  role: 'student' | 'creator' | 'admin';
+  firstSeen: string;
+  lastActive: string;
+  uploadCount: number;
+  lessonsCompleted: number;
+  deviceType: string;
+  browser: string;
+}
+
+

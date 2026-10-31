@@ -2,14 +2,17 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * Memo 3D Character Experience - Three.js
- * A cute white minimal pen with green-to-blue futuristic lighting headgear.
+ * A cute white minimal stylus companion with futuristic lighting headgear,
+ * featuring a special Halloween theme with a sculpted 3D witch hat,
+ * vampire teeth, and spooky pumpkin-violet ambiance.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { playCalmChime, playSoftTap } from '../utils/audioChimes';
 
-export type MemoMood = 'idle' | 'thinking' | 'happy' | 'explaining';
+export type MemoMood = 'idle' | 'thinking' | 'happy' | 'explaining' | 'scholar' | 'celebrate' | 'cheer' | 'focus';
+export type MemoColorPreset = 'aurora' | 'cyan' | 'lime' | 'twilight' | 'halloween' | 'scholar-gold';
 
 interface MemoThreeCanvasProps {
   mood?: MemoMood;
@@ -19,7 +22,8 @@ interface MemoThreeCanvasProps {
   showControlsOverlay?: boolean;
   onMemoClick?: () => void;
   soundEnabled?: boolean;
-  customColorPreset?: 'aurora' | 'cyan' | 'lime' | 'twilight';
+  customColorPreset?: MemoColorPreset;
+  halloweenTheme?: boolean;
 }
 
 export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
@@ -31,6 +35,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
   onMemoClick,
   soundEnabled = true,
   customColorPreset = 'aurora',
+  halloweenTheme = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -40,6 +45,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
   const stateRef = useRef({
     mood,
     customColorPreset,
+    halloweenTheme,
     isHovered: false,
     spinVelocity: 0,
     jumpOffset: 0,
@@ -54,6 +60,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
 
   stateRef.current.mood = mood;
   stateRef.current.customColorPreset = customColorPreset;
+  stateRef.current.halloweenTheme = halloweenTheme;
   stateRef.current.isHovered = isHovered;
 
   useEffect(() => {
@@ -80,6 +87,9 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.display = 'block';
     container.appendChild(renderer.domElement);
 
     // PROCEDURAL DIGITAL VISOR FACE TEXTURE
@@ -91,18 +101,23 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     const faceTexture = new THREE.CanvasTexture(faceCanvas);
     faceTexture.colorSpace = THREE.SRGBColorSpace;
 
-    function drawFace(currentMood: MemoMood, isBlinking: boolean, time: number) {
+    function drawFace(currentMood: MemoMood, isBlinking: boolean, time: number, isHalloween: boolean) {
       faceCtx.clearRect(0, 0, 512, 256);
 
       // Deep dark sleek visor glass gradient backing
       const bgGrad = faceCtx.createLinearGradient(0, 0, 512, 256);
-      bgGrad.addColorStop(0, '#09101b');
-      bgGrad.addColorStop(1, '#0e1828');
+      if (isHalloween) {
+        bgGrad.addColorStop(0, '#120b1c');
+        bgGrad.addColorStop(1, '#1e112a');
+      } else {
+        bgGrad.addColorStop(0, '#09101b');
+        bgGrad.addColorStop(1, '#0e1828');
+      }
       faceCtx.fillStyle = bgGrad;
       faceCtx.fillRect(0, 0, 512, 256);
 
       // Cute futuristic neon glow line
-      faceCtx.strokeStyle = 'rgba(43, 168, 240, 0.25)';
+      faceCtx.strokeStyle = isHalloween ? 'rgba(255, 107, 0, 0.35)' : 'rgba(43, 168, 240, 0.25)';
       faceCtx.lineWidth = 4;
       faceCtx.beginPath();
       faceCtx.moveTo(40, 40);
@@ -114,14 +129,23 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       faceCtx.lineCap = 'round';
       faceCtx.lineJoin = 'round';
 
-      // Futuristic glow styling: cyan to neon lime gradient
+      // Eye gradient (Halloween gets vibrant pumpkin orange & mystic purple gradient)
       const eyeGrad = faceCtx.createLinearGradient(120, 100, 390, 160);
-      eyeGrad.addColorStop(0, '#2BA8F0');
-      eyeGrad.addColorStop(0.5, '#22D08B');
-      eyeGrad.addColorStop(1, '#7FDB22');
-      faceCtx.strokeStyle = eyeGrad;
-      faceCtx.shadowColor = '#22D08B';
-      faceCtx.shadowBlur = 18;
+      if (isHalloween) {
+        eyeGrad.addColorStop(0, '#FF6B00');
+        eyeGrad.addColorStop(0.5, '#FFA726');
+        eyeGrad.addColorStop(1, '#C026D3');
+        faceCtx.strokeStyle = eyeGrad;
+        faceCtx.shadowColor = '#FF6B00';
+        faceCtx.shadowBlur = 18;
+      } else {
+        eyeGrad.addColorStop(0, '#2BA8F0');
+        eyeGrad.addColorStop(0.5, '#22D08B');
+        eyeGrad.addColorStop(1, '#7FDB22');
+        faceCtx.strokeStyle = eyeGrad;
+        faceCtx.shadowColor = '#22D08B';
+        faceCtx.shadowBlur = 18;
+      }
 
       if (isBlinking) {
         // Blinking flat resting lines
@@ -144,13 +168,97 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
         faceCtx.arc(330, 140, 30, Math.PI * 1.1, Math.PI * 1.9, false);
         faceCtx.stroke();
 
-        // Cheerful pinkish-cyan blush spots
-        faceCtx.fillStyle = 'rgba(43, 168, 240, 0.4)';
+        // Cheerful blush spots
+        faceCtx.fillStyle = isHalloween ? 'rgba(255, 107, 0, 0.45)' : 'rgba(43, 168, 240, 0.4)';
         faceCtx.beginPath();
         faceCtx.ellipse(140, 175, 18, 9, 0, 0, Math.PI * 2);
         faceCtx.fill();
         faceCtx.beginPath();
         faceCtx.ellipse(370, 175, 18, 9, 0, 0, Math.PI * 2);
+        faceCtx.fill();
+      } else if (currentMood === 'scholar') {
+        // Scholar Mode: Elegant round reading spectacles with attentive studious eyes
+        faceCtx.beginPath();
+        faceCtx.ellipse(180, 130, 20, 24, 0, 0, Math.PI * 2);
+        faceCtx.fillStyle = eyeGrad;
+        faceCtx.fill();
+
+        faceCtx.beginPath();
+        faceCtx.ellipse(330, 130, 20, 24, 0, 0, Math.PI * 2);
+        faceCtx.fill();
+
+        // Round wireframe reading glasses
+        faceCtx.strokeStyle = '#D4AF37';
+        faceCtx.lineWidth = 5;
+        faceCtx.beginPath();
+        faceCtx.arc(180, 130, 38, 0, Math.PI * 2);
+        faceCtx.stroke();
+
+        faceCtx.beginPath();
+        faceCtx.arc(330, 130, 38, 0, Math.PI * 2);
+        faceCtx.stroke();
+
+        // Spectacles bridge wire
+        faceCtx.beginPath();
+        faceCtx.moveTo(218, 126);
+        faceCtx.quadraticCurveTo(255, 116, 292, 126);
+        faceCtx.stroke();
+      } else if (currentMood === 'celebrate') {
+        // Celebration: Star-burst eyes with joyful gold aura!
+        const drawStar = (cx: number, cy: number, r: number) => {
+          faceCtx.fillStyle = '#FFD700';
+          faceCtx.shadowColor = '#FFA500';
+          faceCtx.shadowBlur = 16;
+          faceCtx.beginPath();
+          faceCtx.moveTo(cx, cy - r);
+          faceCtx.quadraticCurveTo(cx, cy, cx + r, cy);
+          faceCtx.quadraticCurveTo(cx, cy, cx, cy + r);
+          faceCtx.quadraticCurveTo(cx, cy, cx - r, cy);
+          faceCtx.quadraticCurveTo(cx, cy, cx, cy - r);
+          faceCtx.fill();
+        };
+        drawStar(180, 130, 28);
+        drawStar(330, 130, 28);
+
+        // Cheerful rainbow blush
+        faceCtx.fillStyle = 'rgba(255, 180, 50, 0.5)';
+        faceCtx.beginPath();
+        faceCtx.ellipse(135, 175, 18, 8, 0, 0, Math.PI * 2);
+        faceCtx.fill();
+        faceCtx.beginPath();
+        faceCtx.ellipse(375, 175, 18, 8, 0, 0, Math.PI * 2);
+        faceCtx.fill();
+      } else if (currentMood === 'cheer') {
+        // Cheering: One winking eye, one star eye with smile
+        faceCtx.beginPath();
+        faceCtx.arc(180, 135, 24, Math.PI * 0.1, Math.PI * 0.9, false);
+        faceCtx.strokeStyle = eyeGrad;
+        faceCtx.lineWidth = 10;
+        faceCtx.stroke();
+
+        faceCtx.beginPath();
+        faceCtx.ellipse(330, 130, 22, 26, 0, 0, Math.PI * 2);
+        faceCtx.fillStyle = eyeGrad;
+        faceCtx.fill();
+      } else if (currentMood === 'focus') {
+        // Deep Focus: Sleek horizontal cognitive flow lines
+        faceCtx.strokeStyle = eyeGrad;
+        faceCtx.lineWidth = 10;
+        faceCtx.beginPath();
+        faceCtx.moveTo(145, 135);
+        faceCtx.lineTo(215, 135);
+        faceCtx.stroke();
+
+        faceCtx.beginPath();
+        faceCtx.moveTo(295, 135);
+        faceCtx.lineTo(365, 135);
+        faceCtx.stroke();
+
+        // Pulsing cognitive center core
+        const coreOsc = (Math.sin(time * 3) + 1) * 0.5;
+        faceCtx.fillStyle = `rgba(34, 208, 139, ${0.4 + coreOsc * 0.5})`;
+        faceCtx.beginPath();
+        faceCtx.arc(255, 135, 8 + coreOsc * 6, 0, Math.PI * 2);
         faceCtx.fill();
       } else if (currentMood === 'thinking') {
         // Curious thinking wave: one high eye, one pulse dot, oscillating
@@ -165,7 +273,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
         faceCtx.fill();
 
         // Thinking futuristic scanner beam
-        faceCtx.strokeStyle = 'rgba(127, 219, 34, 0.7)';
+        faceCtx.strokeStyle = isHalloween ? 'rgba(255, 167, 38, 0.75)' : 'rgba(127, 219, 34, 0.7)';
         faceCtx.lineWidth = 3;
         const scanX = 180 + (Math.sin(time * 4) + 1) * 75;
         faceCtx.beginPath();
@@ -192,6 +300,41 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
         faceCtx.beginPath();
         faceCtx.arc(338, 120, 8, 0, Math.PI * 2);
         faceCtx.fill();
+      }
+
+      // HALLOWEEN VAMPIRE TEETH ON VISOR
+      if (isHalloween) {
+        faceCtx.save();
+        faceCtx.lineWidth = 3.5;
+        faceCtx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+        faceCtx.fillStyle = '#FFFFFF';
+        faceCtx.shadowColor = '#FF6B00';
+        faceCtx.shadowBlur = 12;
+
+        // Cute mischievous smile mouth line
+        faceCtx.beginPath();
+        faceCtx.arc(256, 165, 30, 0.16 * Math.PI, 0.84 * Math.PI, false);
+        faceCtx.stroke();
+
+        // Left vampire fang
+        faceCtx.beginPath();
+        faceCtx.moveTo(234, 172);
+        faceCtx.lineTo(246, 172);
+        faceCtx.lineTo(240, 202);
+        faceCtx.closePath();
+        faceCtx.fill();
+        faceCtx.stroke();
+
+        // Right vampire fang
+        faceCtx.beginPath();
+        faceCtx.moveTo(266, 172);
+        faceCtx.lineTo(278, 172);
+        faceCtx.lineTo(272, 202);
+        faceCtx.closePath();
+        faceCtx.fill();
+        faceCtx.stroke();
+
+        faceCtx.restore();
       }
 
       faceTexture.needsUpdate = true;
@@ -260,7 +403,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     clip.rotation.x = 0.04;
     memoRoot.add(clip);
 
-    // 7. FUTURISTIC LIGHTING HEADGEAR: Halo ring with green-to-blue glow
+    // 7. FUTURISTIC LIGHTING HEADGEAR: Halo ring with glow
     const headgearRingGeo = new THREE.TorusGeometry(0.56, 0.06, 20, 60);
     const neonHeadgearMat = new THREE.MeshStandardMaterial({
       color: 0x22d08b,
@@ -309,7 +452,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     visor.position.set(0, 0.88, 0.02);
     memoRoot.add(visor);
 
-    // 9. Crown antenna beacon
+    // 9. Standard crown antenna beacon (hidden when wearing witch hat)
     const beaconPostGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.35, 16);
     const beaconPost = new THREE.Mesh(beaconPostGeo, chromeMat);
     beaconPost.position.y = 1.62;
@@ -324,6 +467,106 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     const beaconOrb = new THREE.Mesh(beaconOrbGeo, beaconOrbMat);
     beaconOrb.position.y = 1.8;
     memoRoot.add(beaconOrb);
+
+    // ==========================================
+    // HALLOWEEN ASSET 1: 3D WITCH HAT
+    // ==========================================
+    const witchHatGroup = new THREE.Group();
+    witchHatGroup.position.set(0, 1.44, 0.02);
+    memoRoot.add(witchHatGroup);
+
+    // Witch hat velvet dark material
+    const witchHatMat = new THREE.MeshStandardMaterial({
+      color: 0x1c1328,
+      roughness: 0.65,
+      metalness: 0.12,
+    });
+
+    // Witch hat wide brim
+    const brimGeo = new THREE.CylinderGeometry(0.74, 0.82, 0.04, 40);
+    const brim = new THREE.Mesh(brimGeo, witchHatMat);
+    brim.rotation.x = -0.06;
+    brim.rotation.z = -0.05;
+    witchHatGroup.add(brim);
+
+    // Witch hat base cone
+    const hatBaseGeo = new THREE.ConeGeometry(0.44, 0.72, 36);
+    const hatBase = new THREE.Mesh(hatBaseGeo, witchHatMat);
+    hatBase.position.y = 0.36;
+    witchHatGroup.add(hatBase);
+
+    // Witch hat bent crooked tip (iconic stylish witch silhouette)
+    const hatTipGeo = new THREE.ConeGeometry(0.22, 0.46, 28);
+    const hatTip = new THREE.Mesh(hatTipGeo, witchHatMat);
+    hatTip.position.set(-0.04, 0.82, -0.04);
+    hatTip.rotation.z = -0.28;
+    hatTip.rotation.x = -0.18;
+    witchHatGroup.add(hatTip);
+
+    // Tip golden charm orb
+    const hatCharmGeo = new THREE.SphereGeometry(0.045, 16, 16);
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xf59e0b,
+      roughness: 0.25,
+      metalness: 0.85,
+      emissive: 0xd97706,
+      emissiveIntensity: 0.3,
+    });
+    const hatCharm = new THREE.Mesh(hatCharmGeo, goldMat);
+    hatCharm.position.set(-0.16, 1.04, -0.12);
+    witchHatGroup.add(hatCharm);
+
+    // Witch hat ribbon band (vibrant pumpkin orange with subtle glow)
+    const ribbonGeo = new THREE.CylinderGeometry(0.45, 0.46, 0.11, 36);
+    const ribbonMat = new THREE.MeshStandardMaterial({
+      color: 0xff6b00,
+      emissive: 0xff6b00,
+      emissiveIntensity: 0.6,
+      roughness: 0.35,
+    });
+    const ribbon = new THREE.Mesh(ribbonGeo, ribbonMat);
+    ribbon.position.y = 0.08;
+    witchHatGroup.add(ribbon);
+
+    // Golden witch buckle
+    const buckleOuterGeo = new THREE.BoxGeometry(0.16, 0.13, 0.04);
+    const buckleOuter = new THREE.Mesh(buckleOuterGeo, goldMat);
+    buckleOuter.position.set(0, 0.08, 0.455);
+    witchHatGroup.add(buckleOuter);
+
+    const buckleInnerGeo = new THREE.BoxGeometry(0.09, 0.07, 0.045);
+    const buckleInner = new THREE.Mesh(buckleInnerGeo, witchHatMat);
+    buckleInner.position.set(0, 0.08, 0.456);
+    witchHatGroup.add(buckleInner);
+
+    // ==========================================
+    // HALLOWEEN ASSET 2: 3D SCULPTED VAMPIRE TEETH
+    // ==========================================
+    const fangsGroup = new THREE.Group();
+    memoRoot.add(fangsGroup);
+
+    // Pearlescent white enamel material for vampire fangs
+    const fangMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.12,
+      metalness: 0.08,
+      emissive: 0xfff3ea,
+      emissiveIntensity: 0.2,
+    });
+
+    // Left sharp 3D vampire fang
+    const leftFangGeo = new THREE.ConeGeometry(0.042, 0.13, 16);
+    const leftFang = new THREE.Mesh(leftFangGeo, fangMat);
+    leftFang.rotation.x = Math.PI;
+    leftFang.position.set(-0.09, 0.62, 0.41);
+    fangsGroup.add(leftFang);
+
+    // Right sharp 3D vampire fang
+    const rightFangGeo = new THREE.ConeGeometry(0.042, 0.13, 16);
+    const rightFang = new THREE.Mesh(rightFangGeo, fangMat);
+    rightFang.rotation.x = Math.PI;
+    rightFang.position.set(0.09, 0.62, 0.41);
+    fangsGroup.add(rightFang);
 
     // 10. PARTICLE AURA: Gentle floating light motes orbiting Memo
     const particleCount = 28;
@@ -354,8 +597,8 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     pCanvas.height = 64;
     const pCtx = pCanvas.getContext('2d')!;
     const pGrad = pCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    pGrad.addColorStop(0, 'rgba(127, 219, 34, 1)');
-    pGrad.addColorStop(0.4, 'rgba(43, 168, 240, 0.7)');
+    pGrad.addColorStop(0, 'rgba(255, 107, 0, 1)');
+    pGrad.addColorStop(0.4, 'rgba(192, 38, 211, 0.7)');
     pGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     pCtx.fillStyle = pGrad;
     pCtx.fillRect(0, 0, 64, 64);
@@ -419,8 +662,15 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       animId = requestAnimationFrame(animate);
       const elapsedTime = (performance.now() - startTime) / 1000;
       const st = stateRef.current;
+      const isHalloween = Boolean(st.halloweenTheme || st.customColorPreset === 'halloween');
 
-      // 1. Blinking and Face update
+      // Halloween Assets Visibility Toggle
+      witchHatGroup.visible = isHalloween;
+      fangsGroup.visible = isHalloween;
+      beaconPost.visible = !isHalloween;
+      beaconOrb.visible = !isHalloween;
+
+      // 1. Blinking and Face update with Halloween Vampire Teeth
       st.blinkTimer += 0.016;
       if (st.blinkTimer > 3.6) {
         st.isBlinking = true;
@@ -429,7 +679,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
           st.blinkTimer = Math.random() * 0.8;
         }
       }
-      drawFace(st.mood, st.isBlinking, elapsedTime);
+      drawFace(st.mood, st.isBlinking, elapsedTime, isHalloween);
 
       // 2. Idle hover floating
       const floatAmp = st.mood === 'thinking' ? 0.04 : 0.09;
@@ -452,33 +702,74 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
 
       memoRoot.position.y = hoverY + st.jumpOffset;
 
-      // 4. Subtle mouse head tracking (smooth lerp)
-      const targetYRot = (st.mouseX * 0.45) + (Math.sin(elapsedTime * 0.7) * 0.08);
-      const targetXRot = (-st.mouseY * 0.25) + (Math.cos(elapsedTime * 0.9) * 0.05);
+      // 4. Subtle mouse head tracking (smooth lerp) & expressive mood poses
+      let targetYRot = st.mouseX * 0.45 + Math.sin(elapsedTime * 0.7) * 0.08;
+      let targetXRot = -st.mouseY * 0.25 + Math.cos(elapsedTime * 0.9) * 0.05;
+
+      if (st.mood === 'scholar') {
+        targetXRot += 0.25; // Scholar studious downward inspection angle
+        targetYRot += Math.sin(elapsedTime * 1.2) * 0.12;
+      } else if (st.mood === 'cheer') {
+        memoRoot.rotation.z = Math.sin(elapsedTime * 5.5) * 0.15; // Upbeat cheering wave
+      } else if (st.mood === 'celebrate') {
+        if (st.spinVelocity < 0.08) st.spinVelocity = 0.28; // Celebration spin
+      } else if (st.mood === 'focus') {
+        const breath = 1 + Math.sin(elapsedTime * 1.5) * 0.035; // Breathing focus expansion
+        memoRoot.scale.set(breath, breath, breath);
+      }
 
       if (st.spinVelocity <= 0.05) {
         memoRoot.rotation.y = THREE.MathUtils.lerp(memoRoot.rotation.y, targetYRot, 0.06);
       }
       memoRoot.rotation.x = THREE.MathUtils.lerp(memoRoot.rotation.x, targetXRot, 0.06);
-      memoRoot.rotation.z = Math.sin(elapsedTime * 1.5) * 0.03;
+      if (st.mood !== 'cheer') {
+        memoRoot.rotation.z = Math.sin(elapsedTime * 1.5) * 0.03;
+      }
 
-      // 5. Headgear futuristic ring animations
+      // Witch hat subtle swaying
+      if (isHalloween) {
+        witchHatGroup.rotation.z = Math.sin(elapsedTime * 2.2) * 0.025;
+        witchHatGroup.rotation.x = Math.cos(elapsedTime * 1.8) * 0.015;
+      }
+
+      // 5. Headgear ring animations
       headgearRing.rotation.z = elapsedTime * 0.4;
       outerHalo.rotation.z = -elapsedTime * 0.7;
 
-      // 6. Dynamic light pulsing based on mood
-      const pulseSpeed = st.mood === 'thinking' ? 9.0 : 2.8;
+      // 6. Dynamic light pulsing based on mood & Halloween theme
+      const pulseSpeed = st.mood === 'thinking' ? 9.0 : st.mood === 'celebrate' ? 8.0 : 2.8;
       const lightPulse = 1.6 + Math.sin(elapsedTime * pulseSpeed) * 0.8;
       headCyanLight.intensity = lightPulse;
       headLimeLight.intensity = lightPulse * 1.1;
 
-      // Update color preset if modified
-      if (st.customColorPreset === 'cyan') {
+      // Color Presets (with special Halloween Pumpkin & Scholar Gold)
+      if (isHalloween) {
+        const colOsc = (Math.sin(elapsedTime * 1.4) + 1) * 0.5;
+        neonHeadgearMat.color.lerpColors(
+          new THREE.Color(0xff6b00), // Pumpkin orange
+          new THREE.Color(0x9d4edd), // Witch violet
+          colOsc
+        );
+        neonHeadgearMat.emissive.copy(neonHeadgearMat.color);
+        headCyanLight.color.setHex(0xff6b00);
+        headLimeLight.color.setHex(0x9d4edd);
+        outerHaloMat.color.setHex(0xff7700);
+      } else if (st.customColorPreset === 'scholar-gold') {
+        neonHeadgearMat.color.setHex(0xd4af37);
+        neonHeadgearMat.emissive.setHex(0xb8860b);
+        headCyanLight.color.setHex(0xd4af37);
+        headLimeLight.color.setHex(0xc5a059);
+        outerHaloMat.color.setHex(0xd4af37);
+      } else if (st.customColorPreset === 'cyan') {
         neonHeadgearMat.color.setHex(0x2ba8f0);
         neonHeadgearMat.emissive.setHex(0x2ba8f0);
+        headCyanLight.color.setHex(0x2ba8f0);
+        headLimeLight.color.setHex(0x2ba8f0);
       } else if (st.customColorPreset === 'lime') {
         neonHeadgearMat.color.setHex(0x7fdb22);
         neonHeadgearMat.emissive.setHex(0x7fdb22);
+        headCyanLight.color.setHex(0x7fdb22);
+        headLimeLight.color.setHex(0x7fdb22);
       } else {
         // Aurora gradient oscillation
         const colOsc = (Math.sin(elapsedTime * 1.2) + 1) * 0.5;
@@ -488,6 +779,8 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
           colOsc
         );
         neonHeadgearMat.emissive.copy(neonHeadgearMat.color);
+        headCyanLight.color.setHex(0x2ba8f0);
+        headLimeLight.color.setHex(0x22d08b);
       }
 
       // 7. Particle aura motion
@@ -501,6 +794,21 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
         positions[i * 3 + 2] = Math.sin(angle) * radius;
       }
       particleGeo.attributes.position.needsUpdate = true;
+
+      // Auto-adapt if container dimensions changed or settled after initial mount
+      if (
+        container &&
+        container.clientWidth > 0 &&
+        container.clientHeight > 0 &&
+        (Math.abs(renderer.domElement.clientWidth - container.clientWidth) > 4 ||
+          Math.abs(renderer.domElement.clientHeight - container.clientHeight) > 4)
+      ) {
+        const cw = container.clientWidth;
+        const ch = container.clientHeight;
+        camera.aspect = cw / ch;
+        camera.updateProjectionMatrix();
+        renderer.setSize(cw, ch);
+      }
 
       renderer.render(scene, camera);
     };
@@ -549,6 +857,22 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       beaconPostGeo.dispose();
       beaconOrbGeo.dispose();
       beaconOrbMat.dispose();
+
+      // Halloween assets disposal
+      witchHatMat.dispose();
+      goldMat.dispose();
+      ribbonMat.dispose();
+      brimGeo.dispose();
+      hatBaseGeo.dispose();
+      hatTipGeo.dispose();
+      hatCharmGeo.dispose();
+      ribbonGeo.dispose();
+      buckleOuterGeo.dispose();
+      buckleInnerGeo.dispose();
+      fangMat.dispose();
+      leftFangGeo.dispose();
+      rightFangGeo.dispose();
+
       particleGeo.dispose();
       particleMat.dispose();
       faceTexture.dispose();
@@ -579,7 +903,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       case 'medium':
         return 'w-48 h-48';
       case 'large':
-        return 'w-72 h-72';
+        return 'w-full h-full min-h-[240px]';
       case 'hero':
         return 'w-full h-80 max-h-[380px]';
       default:
@@ -602,8 +926,8 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
 
       {showControlsOverlay && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full shadow-sm text-xs font-medium text-slate-600 dark:text-slate-300 pointer-events-none">
-          <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse" />
-          <span>Interactive 3D Stylus</span>
+          <span className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" />
+          <span>Interactive 3D Stylus · Halloween Edition</span>
         </div>
       )}
     </div>

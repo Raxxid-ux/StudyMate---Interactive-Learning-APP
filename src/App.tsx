@@ -13,10 +13,24 @@ import { ReviewMistakesView } from './components/ReviewMistakesView.tsx';
 import { FlashcardsView } from './components/FlashcardsView.tsx';
 import { FinalQuizView } from './components/FinalQuizView.tsx';
 import { ContentAuditLedger } from './components/ContentAuditLedger.tsx';
+import { ExamPrepView } from './components/ExamPrepView.tsx';
+import { PomodoroTimer } from './components/PomodoroTimer.tsx';
 import { MemoChatbot } from './components/MemoChatbot.tsx';
 import { SettingsModal } from './components/SettingsModal.tsx';
+import { AdminPanelModal } from './components/AdminPanelModal.tsx';
+import { FeedbackModal } from './components/FeedbackModal.tsx';
+import { StudyGuidePrepModal } from './components/StudyGuidePrepModal.tsx';
+import { ScholarProgressHeader } from './components/ScholarProgressHeader.tsx';
 import { playCalmChime, playSoftTap } from './utils/audioChimes.ts';
-import type { CourseData, Question, QuizAnswer, MistakeRecord, Section, StudyConfiguration } from './types.ts';
+import type {
+  CourseData,
+  Question,
+  QuizAnswer,
+  MistakeRecord,
+  Section,
+  StudyConfiguration,
+  UploadedFileItem,
+} from './types.ts';
 
 const STORAGE_COURSE_KEY = 'lfmd_active_course_v2';
 const STORAGE_PROGRESS_KEY = 'lfmd_active_progress_v2';
@@ -57,9 +71,9 @@ export function AppContent() {
       }
       if (newConfig.theme) {
         if (newConfig.theme === 'slate' || newConfig.theme === 'twilight') {
-          setTheme('dark');
+          setTheme('cosmic');
         } else {
-          setTheme('light');
+          setTheme('meadow');
         }
       }
 
@@ -73,6 +87,18 @@ export function AppContent() {
   // State to control Settings modal open/close
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // State to control Admin Panel modal
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  // State to control Feedback modal
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+
+  // State to control Pomodoro timer modal
+  const [isPomodoroOpen, setIsPomodoroOpen] = useState(false);
+
+  // State to control Study Readiness & Preparation Guide modal
+  const [isStudyPrepOpen, setIsStudyPrepOpen] = useState(false);
+
   // Course & Navigation State
   const [course, setCourse] = useState<CourseData | null>(() => {
     try {
@@ -84,7 +110,7 @@ export function AppContent() {
     }
   });
 
-  const [activeTab, setActiveTab] = useState<'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit'>('lesson');
+  const [activeTab, setActiveTab] = useState<'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit' | 'exam-prep'>('lesson');
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
   // Progress State
@@ -133,6 +159,7 @@ export function AppContent() {
     fileType: string;
     documentText?: string;
     pdfBase64?: string;
+    files?: UploadedFileItem[];
   } | null>(null);
   const [cleanedDocCache, setCleanedDocCache] = useState<{
     cleanedText: string;
@@ -283,7 +310,12 @@ export function AppContent() {
 
     // STEP 2: Read and clean
     if (startFromStep === 'clean' || !cleanData) {
-      setProgressStep('Reading your document...');
+      const fileCount = docPayload.files?.length || 1;
+      setProgressStep(
+        fileCount > 1
+          ? `Loading & ingesting ${fileCount} documents...`
+          : 'Reading and cleaning document contents...'
+      );
       try {
         const cleanRes = await fetch('/api/clean-document', {
           method: 'POST',
@@ -308,7 +340,7 @@ export function AppContent() {
 
     // STEP 3: Plan and merge
     if (startFromStep === 'clean' || startFromStep === 'plan' || !sectionsData) {
-      setProgressStep('Planning your lessons...');
+      setProgressStep('Outlining curriculum topics and chapter boundaries...');
       try {
         const planRes = await fetch('/api/plan-and-merge', {
           method: 'POST',
@@ -342,7 +374,7 @@ export function AppContent() {
     }
 
     // STEP 4: Build Lesson 1 first
-    setProgressStep(`Building lesson 1 of ${sectionsData!.length}...`);
+    setProgressStep(`Structuring lesson 1 of ${sectionsData!.length} & self-test questions...`);
     try {
       const s0Res = await fetch('/api/build-section-lesson', {
         method: 'POST',
@@ -399,6 +431,40 @@ export function AppContent() {
       setCurrentSectionIndex(0);
       setIsProcessing(false);
       setActiveTab('lesson');
+      setIsStudyPrepOpen(true); // Automatically show Study Guide Tips after loading!
+
+      // Record upload in Admin store & localStorage for administrative inspection
+      const uploadRecord = {
+        documentTitle: newCourse.documentTitle,
+        fileNames: docPayload.files ? docPayload.files.map((f) => f.fileName) : [docPayload.fileName],
+        fileTypes: docPayload.files ? docPayload.files.map((f) => f.fileType) : [docPayload.fileType],
+        totalSize: docPayload.files
+          ? docPayload.files.reduce((acc, f) => acc + (f.fileSize || 0), 0)
+          : (docPayload.documentText?.length || 5000),
+        sectionCount: sectionsData!.length,
+        contentSnippet: cleanData!.cleanedText ? cleanData!.cleanedText.slice(0, 240) + '...' : '',
+        fullCleanedText: cleanData!.cleanedText,
+        skippedItems: cleanData!.skippedContent || [],
+        userId: 'usr_abigail_prime',
+        userEmail: 'itsalineabigail@gmail.com',
+      };
+
+      fetch('/api/record-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(uploadRecord),
+      }).catch(() => {});
+
+      try {
+        const stored = localStorage.getItem('studymate_admin_uploads');
+        const list = stored ? JSON.parse(stored) : [];
+        list.unshift({
+          id: `upload_${Date.now()}`,
+          ...uploadRecord,
+          uploadedAt: new Date().toISOString(),
+        });
+        localStorage.setItem('studymate_admin_uploads', JSON.stringify(list));
+      } catch {}
     } catch (err: any) {
       setIsProcessing(false);
       setFailedStep('lesson0');
@@ -411,6 +477,7 @@ export function AppContent() {
     fileType: string;
     documentText?: string;
     pdfBase64?: string;
+    files?: UploadedFileItem[];
   }) => {
     setLastUploadedDoc(docData);
     setCleanedDocCache(null);
@@ -591,6 +658,9 @@ export function AppContent() {
         completedSectionCount={completedSectionIndices.length}
         onOpenMemo={() => setIsMemoOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenFeedback={() => setIsFeedbackOpen(true)}
+        onOpenPomodoro={() => setIsPomodoroOpen(true)}
+        onOpenStudyPrep={() => setIsStudyPrepOpen(true)}
       />
 
       <main className="flex-1 w-full flex flex-col overflow-hidden">
@@ -603,9 +673,10 @@ export function AppContent() {
             onRetry={handleRetryStep}
             onOpenMemo={() => setIsMemoOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenFeedback={() => setIsFeedbackOpen(true)}
           />
         ) : (
-          <div className="flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-4rem)] lg:overflow-hidden bg-white dark:bg-[#0E1117]">
+          <div className="flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-4rem)] lg:overflow-hidden bg-[#FAF6EE] dark:bg-[#0E1117]">
             {/* Mobile View: Collapsible Lesson Dropdown Selector at Top */}
             {activeTab === 'lesson' && (
               <Sidebar
@@ -633,7 +704,20 @@ export function AppContent() {
             )}
 
             {/* Main Lesson Content Area: Flexible, scrollable, pristine reading layout */}
-            <div className="flex-1 min-h-0 w-full h-full overflow-y-auto bg-white dark:bg-[#0E1117] flex flex-col">
+            <div className="flex-1 min-h-0 w-full h-full overflow-y-auto bg-transparent flex flex-col p-3.5 sm:p-6 lg:p-8">
+              {/* Scholar Progress & Habit Trackers Header matching reference image */}
+              <ScholarProgressHeader
+                completedCount={completedSectionIndices.length}
+                totalSections={course.sections.length}
+                onStartQuiz={() => setActiveTab('final-quiz')}
+                onOpenPomodoro={() => setIsPomodoroOpen(true)}
+                onOpenNotes={() => {
+                  setActiveTab('lesson');
+                }}
+                onBrowseLibrary={() => setShowNewDocConfirm(true)}
+                currentLessonTitle={currentSection?.title}
+              />
+
               {activeTab === 'lesson' && currentSection && (
                 <LessonView
                   section={currentSection}
@@ -668,6 +752,16 @@ export function AppContent() {
               )}
 
               {activeTab === 'final-quiz' && <FinalQuizView course={course} />}
+
+              {activeTab === 'exam-prep' && (
+                <ExamPrepView
+                  course={course}
+                  onJumpToLesson={(idx) => {
+                    setCurrentSectionIndex(idx);
+                    setActiveTab('lesson');
+                  }}
+                />
+              )}
 
               {activeTab === 'audit' && <ContentAuditLedger course={course} />}
             </div>
@@ -727,6 +821,45 @@ export function AppContent() {
         onClose={() => setIsSettingsOpen(false)}
         studyConfig={studyConfig}
         onUpdateStudyConfig={handleUpdateStudyConfig}
+        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenFeedback={() => setIsFeedbackOpen(true)}
+      />
+
+      {/* Admin System Portal (Secured with creator key 9656756757) */}
+      <AdminPanelModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        currentCourseCleanedText={cleanedDocCache?.cleanedText}
+        currentCourseTitle={course?.documentTitle}
+        onOpenFeedback={() => {
+          setIsAdminOpen(false);
+          setIsFeedbackOpen(true);
+        }}
+      />
+
+      {/* User Feedback & Suggestions Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+        defaultEmail="itsalineabigail@gmail.com"
+        audioEnabled={studyConfig.audioFeedback}
+      />
+
+      {/* Pomodoro Focus & Interval Modal */}
+      <PomodoroTimer
+        isOpenModal={isPomodoroOpen}
+        onCloseModal={() => setIsPomodoroOpen(false)}
+      />
+
+      {/* Study Readiness & Preparation Guide Modal */}
+      <StudyGuidePrepModal
+        isOpen={isStudyPrepOpen}
+        onClose={() => setIsStudyPrepOpen(false)}
+        onStartStudy={() => {
+          setActiveTab('lesson');
+          setIsStudyPrepOpen(false);
+        }}
+        documentTitle={course?.documentTitle}
       />
     </div>
   );

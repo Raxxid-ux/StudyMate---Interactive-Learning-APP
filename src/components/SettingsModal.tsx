@@ -2,7 +2,8 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * StudyMate Settings Modal
- * Provides configuration options for theme, typography, study pace, audio,
+ * Provides configuration options for multi-theme selection (Meadow Sage benchmark, Aurora, Cosmic, Sepia, High Contrast),
+ * ADHD & Dyslexia neurodiversity accessibility tools, study pace, audio,
  * and the dedicated "About the Creator" section with notes from Hamza Rashid.
  */
 
@@ -28,8 +29,16 @@ import {
   Instagram,
   Linkedin,
   ExternalLink,
+  Lock,
+  ShieldCheck,
+  MessageCircle,
+  Activity,
+  Eye,
+  Zap,
+  WitchHat,
+  CheckCircle2,
 } from './icons.tsx';
-import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
+import { useThemeAndText, AppTheme, SupportStyle } from '../context/ThemeAndTextContext.tsx';
 import type { StudyConfiguration } from '../types.ts';
 import { playCalmChime, playSoftTap } from '../utils/audioChimes.ts';
 
@@ -38,6 +47,8 @@ interface SettingsModalProps {
   onClose: () => void;
   studyConfig: StudyConfiguration;
   onUpdateStudyConfig: (newConfig: Partial<StudyConfiguration>) => void;
+  onOpenAdmin?: () => void;
+  onOpenFeedback?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -45,9 +56,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   studyConfig,
   onUpdateStudyConfig,
+  onOpenAdmin,
+  onOpenFeedback,
 }) => {
-  const { theme, setTheme, textSize, setTextSize } = useThemeAndText();
-  const [activeTab, setActiveTab] = useState<'appearance' | 'study' | 'creator'>('appearance');
+  const {
+    theme,
+    setTheme,
+    textSize,
+    setTextSize,
+    dyslexicFont,
+    toggleDyslexicFont,
+    bionicReading,
+    toggleBionicReading,
+    readingRuler,
+    toggleReadingRuler,
+    singleChunkFocus,
+    toggleSingleChunkFocus,
+    supportStyle,
+    setSupportStyle,
+    memoHalloweenTheme,
+    toggleMemoHalloweenTheme,
+    language,
+    setLanguage,
+    t,
+  } = useThemeAndText();
+
+  const [activeTab, setActiveTab] = useState<'appearance' | 'neurodiversity' | 'study' | 'creator'>('appearance');
   const [copiedNote, setCopiedNote] = useState(false);
 
   if (!isOpen) return null;
@@ -68,7 +102,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const handleResetDefaults = () => {
     playSoftTap(true);
-    setTheme('light');
+    setTheme('meadow');
     setTextSize('normal');
     onUpdateStudyConfig({
       fontSize: 'standard',
@@ -80,6 +114,69 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       autoAdvanceChunks: false,
     });
   };
+
+  const themesList: Array<{
+    id: AppTheme;
+    name: string;
+    subtitle: string;
+    badge?: string;
+    previewBg: string;
+    previewAccent: string;
+    previewText: string;
+  }> = [
+    {
+      id: 'academia',
+      name: 'Dark Academia',
+      subtitle: 'Warm scholar parchment, deep antique wood, and gold leaf',
+      badge: 'Scholar',
+      previewBg: 'bg-[#F7F4EC]',
+      previewAccent: 'bg-[#C5A059]',
+      previewText: 'text-[#2D251E]',
+    },
+    {
+      id: 'meadow',
+      name: 'Meadow Sage',
+      subtitle: 'Soft airy base, calm sage green, pristine reading',
+      badge: 'Benchmark',
+      previewBg: 'bg-[#F3F7F3]',
+      previewAccent: 'bg-[#22C55E]',
+      previewText: 'text-[#213327]',
+    },
+    {
+      id: 'aurora',
+      name: 'Aurora Sky',
+      subtitle: 'Cool crisp daylight with vibrant blue clarity',
+      previewBg: 'bg-[#EDF2F8]',
+      previewAccent: 'bg-[#1A6EF0]',
+      previewText: 'text-[#1E293B]',
+    },
+    {
+      id: 'cosmic',
+      name: 'Cosmic Night',
+      subtitle: 'Deep starlight slate for relaxed evening study',
+      badge: 'Dark',
+      previewBg: 'bg-[#10141D]',
+      previewAccent: 'bg-[#60A5FA]',
+      previewText: 'text-[#F1F5F9]',
+    },
+    {
+      id: 'sepia',
+      name: 'Sepia Warmth',
+      subtitle: 'Warm bookish parchment, gentle on fatigued eyes',
+      previewBg: 'bg-[#FAF6EE]',
+      previewAccent: 'bg-[#D97706]',
+      previewText: 'text-[#452B14]',
+    },
+    {
+      id: 'high-contrast',
+      name: 'High Contrast',
+      subtitle: 'Maximum edge sharpness and bold tactile legibility',
+      badge: 'A11y',
+      previewBg: 'bg-black',
+      previewAccent: 'bg-[#A3E635]',
+      previewText: 'text-white',
+    },
+  ];
 
   return (
     <div
@@ -100,10 +197,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             <div>
               <h2 id="settings-title" className="text-base sm:text-lg font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
-                Settings
+                Settings & Accessibility
               </h2>
               <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
-                Personalize your StudyMate study experience
+                Themes, ADHD & Dyslexia tools, study pacing, and creator notes
               </p>
             </div>
           </div>
@@ -116,21 +213,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 px-6 py-2.5 bg-zinc-100/60 dark:bg-zinc-900/60 border-b border-zinc-200/60 dark:border-zinc-800/60">
+        {/* Navigation Tabs (4 Sections) */}
+        <div className="flex items-center gap-1 px-4 sm:px-6 py-2.5 bg-zinc-100/60 dark:bg-zinc-900/60 border-b border-zinc-200/60 dark:border-zinc-800/60 overflow-x-auto no-scrollbar">
           <button
             onClick={() => {
               setActiveTab('appearance');
               playSoftTap(studyConfig.audioFeedback);
             }}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === 'appearance'
                 ? 'bg-white dark:bg-[#1F2430] text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
             <Sun className="w-3.5 h-3.5" />
-            <span>Appearance</span>
+            <span>Themes</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab('neurodiversity');
+              playSoftTap(studyConfig.audioFeedback);
+            }}
+            className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+              activeTab === 'neurodiversity'
+                ? 'bg-white dark:bg-[#1F2430] text-emerald-600 dark:text-emerald-400 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5" />
+            <span>ADHD & Dyslexia</span>
           </button>
 
           <button
@@ -138,7 +250,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               setActiveTab('study');
               playSoftTap(studyConfig.audioFeedback);
             }}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === 'study'
                 ? 'bg-white dark:bg-[#1F2430] text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -153,7 +265,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               setActiveTab('creator');
               playSoftTap(studyConfig.audioFeedback);
             }}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === 'creator'
                 ? 'bg-white dark:bg-[#1F2430] text-[#E11D48] dark:text-[#FB7185] shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-[#E11D48] dark:hover:text-[#FB7185]'
@@ -166,75 +278,159 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Tab Content Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
-          {/* TAB 1: APPEARANCE */}
+          {/* TAB 1: APPEARANCE & THEMES */}
           {activeTab === 'appearance' && (
             <div className="space-y-6">
-              {/* Theme Mode */}
+              {/* Multi-Theme Selector */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                    Theme Mode
+                    Color Themes
                   </label>
                   <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
-                    Light is default
+                    Meadow Sage is Benchmark
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {themesList.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setTheme(t.id);
+                        playSoftTap(studyConfig.audioFeedback);
+                      }}
+                      className={`p-3.5 rounded-2xl border-2 flex items-center gap-3 transition-all cursor-pointer text-left ${
+                        theme === t.id
+                          ? 'border-[#1A6EF0] dark:border-[#64B5F6] bg-blue-50/40 dark:bg-blue-950/20 shadow-xs'
+                          : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-800/40'
+                      }`}
+                    >
+                      {/* Theme Visual Palette Dot / Swatch */}
+                      <div
+                        className={`w-9 h-9 rounded-xl ${t.previewBg} border border-zinc-300/80 dark:border-zinc-700 flex items-center justify-center shrink-0 shadow-2xs`}
+                      >
+                        <span className={`w-3.5 h-3.5 rounded-full ${t.previewAccent}`} />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                            {t.name}
+                          </span>
+                          {t.badge && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider bg-zinc-200/80 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200">
+                              {t.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                          {t.subtitle}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Language Selection: English & Simple Malayalam */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Language / ഭാഷ
+                    </h3>
+                    <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                      Simple Malayalam for kids & teens, or clear English
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                    Bilingual
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
                     onClick={() => {
-                      setTheme('light');
-                      onUpdateStudyConfig({ theme: 'daylight' });
+                      setLanguage('en');
                       playSoftTap(studyConfig.audioFeedback);
                     }}
-                    className={`p-3.5 rounded-2xl border-2 flex items-center gap-3 transition-all cursor-pointer text-left ${
-                      theme === 'light'
-                        ? 'border-[#1A6EF0] bg-[#1A6EF0]/5 dark:bg-[#1A6EF0]/10 shadow-xs'
-                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40'
+                    className={`p-3 rounded-2xl border-2 flex items-center justify-between transition-all cursor-pointer ${
+                      language === 'en'
+                        ? 'border-[#1A6EF0] bg-blue-50/50 dark:bg-blue-950/30'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
-                      <Sun className="w-5 h-5" />
-                    </div>
                     <div>
-                      <div className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                        Light Theme
+                      <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                        English
                       </div>
-                      <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9]">
-                        Default, paper-clear
-                      </div>
+                      <div className="text-[10px] text-zinc-500">Global Scholar</div>
                     </div>
+                    {language === 'en' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => {
-                      setTheme('dark');
-                      onUpdateStudyConfig({ theme: 'twilight' });
+                      setLanguage('ml');
                       playSoftTap(studyConfig.audioFeedback);
                     }}
-                    className={`p-3.5 rounded-2xl border-2 flex items-center gap-3 transition-all cursor-pointer text-left ${
-                      theme === 'dark'
-                        ? 'border-[#1A6EF0] bg-[#1A6EF0]/5 dark:bg-[#1A6EF0]/10 shadow-xs'
-                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40'
+                    className={`p-3 rounded-2xl border-2 flex items-center justify-between transition-all cursor-pointer ${
+                      language === 'ml'
+                        ? 'border-[#1A6EF0] bg-blue-50/50 dark:bg-blue-950/30'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400 flex items-center justify-center">
-                      <Moon className="w-5 h-5" />
-                    </div>
                     <div>
-                      <div className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                        Dark Theme
+                      <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                        മലയാളം (Malayalam)
                       </div>
-                      <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9]">
-                        Relaxed evening reading
-                      </div>
+                      <div className="text-[10px] text-zinc-500">ലളിതമായ ഭാഷ</div>
                     </div>
+                    {language === 'ml' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
                   </button>
                 </div>
               </div>
 
-              {/* Typography / Text Size */}
+              {/* Memo Halloween Special Theme Toggle */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-orange-500/10 border border-orange-400/40 dark:border-orange-500/30 flex items-center justify-between gap-3 shadow-2xs">
+                <div className="space-y-0.5 pr-2">
+                  <div className="flex items-center gap-2">
+                    <WitchHat className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Memo Halloween Theme
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-orange-500 text-white uppercase tracking-wider">
+                      Special Edition
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                    Equips Memo with a 3D velvet witch hat, vampire fangs, and spooky pumpkin-violet ambiance
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleMemoHalloweenTheme();
+                    playCalmChime(studyConfig.audioFeedback);
+                  }}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    memoHalloweenTheme ? 'bg-orange-500' : 'bg-zinc-300 dark:bg-zinc-700'
+                  }`}
+                  aria-label="Toggle Memo Halloween theme"
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      memoHalloweenTheme ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Typography / Reading Text Size */}
               <div className="space-y-2.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                   Reading Text Size
@@ -268,7 +464,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Typography Preview */}
                 <div className="p-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800">
                   <div className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
-                    Live Preview
+                    Live Typography Preview
                   </div>
                   <p
                     className={
@@ -286,7 +482,214 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {/* TAB 2: STUDY CONFIGURATION */}
+          {/* TAB 2: ADHD & DYSLEXIA SUITE */}
+          {activeTab === 'neurodiversity' && (
+            <div className="space-y-6">
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 flex items-start gap-3">
+                <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div className="text-xs leading-relaxed">
+                  <span className="font-bold">Neurodiversity-Informed Design:</span> Tools built for scattered focus, visual crowding, ADHD attention drift, and dyslexia comprehension.
+                </div>
+              </div>
+
+              {/* 1. Dyslexia Font Toggle */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
+                <div className="space-y-0.5 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
+                      Dyslexia-Optimized Font (Lexend)
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                      High Aperture
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                    Uses wider character spacing and unique bottom-weighted glyph geometry to prevent letter flipping and crowding.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleDyslexicFont();
+                    playSoftTap(studyConfig.audioFeedback);
+                  }}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    dyslexicFont ? 'bg-emerald-600' : 'bg-zinc-300 dark:bg-zinc-700'
+                  }`}
+                  aria-label="Toggle dyslexia-optimized font"
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      dyslexicFont ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* 2. Bionic Reading Anchors */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
+                <div className="space-y-0.5 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
+                      Bionic Reading Anchors
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300">
+                      Fixation Points
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                    Bolds the initial letters of each word to create natural fixation anchors, allowing fast scanning with less eye strain.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleBionicReading();
+                    playSoftTap(studyConfig.audioFeedback);
+                  }}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    bionicReading ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
+                  }`}
+                  aria-label="Toggle bionic reading anchors"
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      bionicReading ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* 3. Horizontal Reading Ruler Guide */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
+                <div className="space-y-0.5 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
+                      Reading Ruler Overlay
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
+                      Line Tracker
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                    Projects a soft highlighting guide following your cursor to prevent skipping lines or losing your place on the page.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleReadingRuler();
+                    playSoftTap(studyConfig.audioFeedback);
+                  }}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    readingRuler ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'
+                  }`}
+                  aria-label="Toggle reading ruler overlay"
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      readingRuler ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* 4. ADHD Single-Chunk Focus (Low-Stimulus Mode) */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
+                <div className="space-y-0.5 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
+                      ADHD Single-Chunk Focus Mode
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300">
+                      Anti-Overwhelm
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                    Gently dims peripheral content so only the currently active explanation is in full contrast, reducing visual noise.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleSingleChunkFocus();
+                    playSoftTap(studyConfig.audioFeedback);
+                  }}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    singleChunkFocus ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'
+                  }`}
+                  aria-label="Toggle single-chunk focus mode"
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      singleChunkFocus ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* 5. Support Style Selector */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Companion Support Style
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {(
+                    [
+                      { id: 'calm', label: 'Calm', desc: 'Grounding, serene pacing' },
+                      { id: 'structured', label: 'Structured', desc: 'Predictable steps & order' },
+                      { id: 'gentle', label: 'Gentle', desc: 'Warm, low-pressure support' },
+                      { id: 'reflective', label: 'Reflective', desc: 'Inquiry and thoughtful pauses' },
+                      { id: 'direct', label: 'Direct', desc: 'Punchy, concise takeaways' },
+                    ] as const
+                  ).map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        setSupportStyle(s.id);
+                        playSoftTap(studyConfig.audioFeedback);
+                      }}
+                      className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                        supportStyle === s.id
+                          ? 'border-[#1A6EF0] bg-[#1A6EF0]/5 text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
+                          : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-700 dark:text-zinc-300'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{s.label}</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{s.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Live Neurodiversity Reading Demo Box */}
+              <div className="p-4 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>Accessibility Live Sample</span>
+                  <span className="text-[10px] font-normal text-zinc-500">
+                    {dyslexicFont ? 'Lexend Active' : 'Default Sans'} · {bionicReading ? 'Bionic Anchors On' : 'Standard'}
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
+                  {bionicReading ? (
+                    <>
+                      <span className="bionic-lead">Und</span>erstanding <span className="bionic-lead">co</span>mplex{' '}
+                      <span className="bionic-lead">co</span>ncepts <span className="bionic-lead">be</span>comes{' '}
+                      <span className="bionic-lead">si</span>mpler <span className="bionic-lead">wh</span>en{' '}
+                      <span className="bionic-lead">ea</span>ch <span className="bionic-lead">se</span>ntence{' '}
+                      <span className="bionic-lead">is</span> <span className="bionic-lead">an</span>chored{' '}
+                      <span className="bionic-lead">cl</span>early.
+                    </>
+                  ) : (
+                    'Understanding complex concepts becomes simpler when each sentence is anchored clearly and paced at your natural frequency.'
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: STUDY CONFIGURATION */}
           {activeTab === 'study' && (
             <div className="space-y-6">
               {/* Study Pace */}
@@ -419,7 +822,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: ABOUT THE CREATOR */}
+          {/* TAB 4: ABOUT THE CREATOR */}
           {activeTab === 'creator' && (
             <div className="space-y-5">
               {/* Creator Card */}
@@ -581,6 +984,65 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     StudyMate was built with the belief that anyone can grasp complex knowledge when given calm pacing, honest grounding, and a friendly companion like Memo.
                   </p>
                 </div>
+
+                {/* Feedback & Improvement Shortcut */}
+                {onOpenFeedback && (
+                  <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <MessageCircle className="w-3.5 h-3.5 text-rose-500" />
+                        <span>Have suggestions for improvement?</span>
+                      </div>
+                      <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9]">
+                        Share feedback directly with the team to make StudyMate better
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenFeedback();
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-500 hover:bg-rose-600 text-white transition-colors cursor-pointer shrink-0 shadow-2xs"
+                    >
+                      Give Feedback
+                    </button>
+                  </div>
+                )}
+
+                {/* Admin Portal Section under About Me */}
+                {onOpenAdmin && (
+                  <div className="p-4.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-zinc-100/60 to-blue-500/10 dark:from-amber-950/20 dark:via-zinc-900/40 dark:to-blue-950/20 border border-amber-300/40 dark:border-amber-800/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                          <Lock className="w-3.5 h-3.5" />
+                        </div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                          Admin System Panel
+                        </h4>
+                        <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/50 dark:border-amber-800">
+                          Restricted
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                        Authorized oversight for total uploads, document contents archive, active user sessions, and feedback management.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenAdmin();
+                      }}
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Open Admin Panel</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}

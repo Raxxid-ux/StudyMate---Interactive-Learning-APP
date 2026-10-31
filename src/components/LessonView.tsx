@@ -58,13 +58,41 @@ export const LessonView: React.FC<LessonViewProps> = ({
   studyConfig,
   onOpenMemo,
 }) => {
-  const { fontSizeClass } = useThemeAndText();
+  const {
+    fontSizeClass,
+    bionicReading,
+    toggleBionicReading,
+    readingRuler,
+    toggleReadingRuler,
+    singleChunkFocus,
+    toggleSingleChunkFocus,
+    dyslexicFont,
+    toggleDyslexicFont,
+  } = useThemeAndText();
 
   // Progressive Chunk State: start at chunk 0, student clicks "Continue" to reveal next chunk
   const [visibleChunkCount, setVisibleChunkCount] = useState(1);
   const [showSimplerWording, setShowSimplerWording] = useState(false);
   const [showOriginalText, setShowOriginalText] = useState(false);
   const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
+
+  // Bionic reading word transformation helper
+  const renderFormattedText = (text: string) => {
+    if (!bionicReading) return text;
+    const words = text.split(/(\s+)/);
+    return words.map((word, wIdx) => {
+      if (!word.trim()) return word;
+      const splitPoint = Math.ceil(word.length * 0.45);
+      const lead = word.slice(0, splitPoint);
+      const tail = word.slice(splitPoint);
+      return (
+        <span key={wIdx}>
+          <strong className="font-extrabold text-zinc-950 dark:text-white bionic-lead">{lead}</strong>
+          <span className="bionic-tail">{tail}</span>
+        </span>
+      );
+    });
+  };
 
   // Reset chunk count when section changes
   useEffect(() => {
@@ -112,9 +140,9 @@ export const LessonView: React.FC<LessonViewProps> = ({
   };
 
   return (
-    <div data-testid="lesson-view" className="flex-1 w-full max-w-3xl xl:max-w-4xl mx-auto px-4 pt-8 pb-32 sm:pb-36 sm:px-6 lg:px-8 space-y-10 flex flex-col justify-between">
-      {/* Section Header */}
-      <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-6 space-y-3">
+    <div data-testid="lesson-view" className="flex-1 w-full max-w-3xl xl:max-w-4xl mx-auto px-4 pt-8 pb-32 sm:pb-36 sm:px-6 lg:px-8 space-y-8 flex flex-col justify-between">
+      {/* Section Header & Neurodivergent Reading Toolbar */}
+      <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#1A6EF0]/10 text-[#1A6EF0] dark:bg-[#1A6EF0]/20 leading-none">
@@ -130,25 +158,84 @@ export const LessonView: React.FC<LessonViewProps> = ({
             )}
           </div>
 
-          {/* Simpler wording button */}
-          <button
-            type="button"
-            onClick={handleTogglePlainWords}
-            disabled={isFetchingPlainWords}
-            className={`h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
-              showSimplerWording
-                ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700'
-                : 'bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/60'
-            }`}
-            title="Read simpler wording without outside facts"
-          >
-            {isFetchingPlainWords ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600 shrink-0" />
-            ) : (
-              <Type className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            )}
-            <span className="leading-none">{showSimplerWording ? 'View Study Chunks' : 'Plain words'}</span>
-          </button>
+          {/* Neurodivergent Reading Toolkit Pills */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {/* Bionic Reading Toggle */}
+            <button
+              type="button"
+              onClick={toggleBionicReading}
+              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
+                bionicReading
+                  ? 'bg-[#1A6EF0] text-white border-[#1A6EF0] shadow-2xs'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+              }`}
+              title="Bionic Reading (Bolds initial recognition letters for ADHD & fast reading)"
+            >
+              <span className="font-bold">Bio</span>nic
+            </button>
+
+            {/* Reading Ruler Toggle */}
+            <button
+              type="button"
+              onClick={toggleReadingRuler}
+              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
+                readingRuler
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+              }`}
+              title="Reading Ruler (Horizontal focus guide that follows cursor)"
+            >
+              Ruler
+            </button>
+
+            {/* ADHD Single-Chunk Focus */}
+            <button
+              type="button"
+              onClick={toggleSingleChunkFocus}
+              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
+                singleChunkFocus
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+              }`}
+              title="ADHD Low-Stimulus Mode (Isolates single chunk to prevent distraction)"
+            >
+              ADHD Focus
+            </button>
+
+            {/* Dyslexia Font Toggle */}
+            <button
+              type="button"
+              onClick={toggleDyslexicFont}
+              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
+                dyslexicFont
+                  ? 'bg-amber-600 text-white border-amber-600 shadow-2xs'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+              }`}
+              title="Dyslexia High-Legibility Font (Lexend weighted baseline)"
+            >
+              Dyslexia Font
+            </button>
+
+            {/* Simpler wording button */}
+            <button
+              type="button"
+              onClick={handleTogglePlainWords}
+              disabled={isFetchingPlainWords}
+              className={`h-8 px-2.5 inline-flex items-center justify-center gap-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
+                showSimplerWording
+                  ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700'
+                  : 'bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/60'
+              }`}
+              title="Read simpler wording without outside facts"
+            >
+              {isFetchingPlainWords ? (
+                <RefreshCw className="w-3 h-3 animate-spin text-amber-600 shrink-0" />
+              ) : (
+                <Type className="w-3 h-3 text-amber-500 shrink-0" />
+              )}
+              <span>{showSimplerWording ? 'Study Chunks' : 'Plain Words'}</span>
+            </button>
+          </div>
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-light text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
@@ -183,24 +270,31 @@ export const LessonView: React.FC<LessonViewProps> = ({
       {/* Progressive Study Chunks: ONE small chunk group at a time */}
       {!showSimplerWording && (
         <section className="space-y-6" aria-label="Study chunks">
-          {chunks.slice(0, visibleChunkCount).map((chunk, cIdx) => (
-            <div
-              key={chunk.id || cIdx}
-              className="p-6 sm:p-7 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-2 animate-fadeIn"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A6EF0]">
-                  {chunk.title}
-                </span>
-                <span className="text-[10px] text-[#5F6573] dark:text-[#A6ACB9]">
-                  Part {cIdx + 1} of {chunks.length}
-                </span>
+          {chunks.slice(0, visibleChunkCount).map((chunk, cIdx) => {
+            const isLatestChunk = cIdx === visibleChunkCount - 1;
+            const isDimmed = singleChunkFocus && !isLatestChunk;
+
+            return (
+              <div
+                key={chunk.id || cIdx}
+                className={`p-6 sm:p-7 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-2 animate-fadeIn transition-all duration-300 ${
+                  isDimmed ? 'single-chunk-dimmed' : ''
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A6EF0]">
+                    {chunk.title}
+                  </span>
+                  <span className="text-[10px] text-[#5F6573] dark:text-[#A6ACB9]">
+                    Part {cIdx + 1} of {chunks.length}
+                  </span>
+                </div>
+                <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] leading-relaxed ${fontSizeClass}`}>
+                  {renderFormattedText(chunk.content)}
+                </p>
               </div>
-              <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] leading-relaxed ${fontSizeClass}`}>
-                {chunk.content}
-              </p>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Continue button if more chunks remain */}
           {!allChunksRevealed && (

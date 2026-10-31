@@ -64,29 +64,132 @@ async function generateContentWithFallback(params: {
   throw lastError;
 }
 
-// STEP 2: READ AND CLEAN (Gemini call #1)
+// In-memory data store for Admin Panel & Analytics (persists across API requests in server lifetime)
+interface StoredUpload {
+  id: string;
+  documentTitle: string;
+  fileNames: string[];
+  fileTypes: string[];
+  totalSize: number;
+  totalWordsEstimate: number;
+  sectionCount: number;
+  uploadedAt: string;
+  userId: string;
+  userEmail: string;
+  contentSnippet: string;
+  fullCleanedText: string;
+  skippedItems: string[];
+}
+
+interface StoredFeedback {
+  id: string;
+  rating: number;
+  sentiment: 'loved' | 'great' | 'good' | 'okay' | 'confusing';
+  category: 'feature' | 'quality' | 'pacing' | 'design' | 'bug' | 'other';
+  message: string;
+  userEmail?: string;
+  userName?: string;
+  submittedAt: string;
+  status: 'new' | 'reviewed';
+}
+
+const seedUploads: StoredUpload[] = [
+  {
+    id: 'upload_seed_1',
+    documentTitle: 'Cell Biology & Energy Production Foundations',
+    fileNames: ['Cell_Biology_Lecture_1.pdf', 'Mitochondria_Notes.md'],
+    fileTypes: ['application/pdf', 'text/markdown'],
+    totalSize: 428000,
+    totalWordsEstimate: 2150,
+    sectionCount: 4,
+    uploadedAt: new Date(Date.now() - 3600 * 1000 * 24 * 2).toISOString(),
+    userId: 'user_abigail_01',
+    userEmail: 'itsalineabigail@gmail.com',
+    contentSnippet: 'Cells extract metabolic energy through respiration and glucose breakdown...',
+    fullCleanedText: 'Cells extract metabolic energy through respiration and glucose breakdown across the cytoplasm and mitochondria. ATP serves as universal cellular currency...',
+    skippedItems: ['Figure 2.1 microscope snapshot (unsupported raster)', 'Header page 1-4'],
+  },
+  {
+    id: 'upload_seed_2',
+    documentTitle: 'Distributed Systems & Paxos Consensus Overview',
+    fileNames: ['Paxos_Made_Simple_Notes.txt'],
+    fileTypes: ['text/plain'],
+    totalSize: 184000,
+    totalWordsEstimate: 1420,
+    sectionCount: 3,
+    uploadedAt: new Date(Date.now() - 3600 * 1000 * 12).toISOString(),
+    userId: 'user_abigail_01',
+    userEmail: 'itsalineabigail@gmail.com',
+    contentSnippet: 'At its core, a consensus algorithm ensures that a single value among proposed values is chosen...',
+    fullCleanedText: 'At its core, a consensus algorithm ensures that a single value among proposed values is chosen safely even with network partitions...',
+    skippedItems: [],
+  },
+];
+
+const seedFeedbacks: StoredFeedback[] = [
+  {
+    id: 'feedback_seed_1',
+    rating: 5,
+    sentiment: 'loved',
+    category: 'quality',
+    message: 'Memo 3D companion is wonderful! The bite-sized lessons make difficult medical chapters actually manageable.',
+    userEmail: 'itsalineabigail@gmail.com',
+    userName: 'Aline Abigail',
+    submittedAt: new Date(Date.now() - 3600 * 1000 * 20).toISOString(),
+    status: 'reviewed',
+  },
+  {
+    id: 'feedback_seed_2',
+    rating: 4,
+    sentiment: 'great',
+    category: 'feature',
+    message: 'Would love to be able to upload multiple PDFs simultaneously for our university finals.',
+    userEmail: 'student_alex@domain.edu',
+    userName: 'Alex C.',
+    submittedAt: new Date(Date.now() - 3600 * 1000 * 6).toISOString(),
+    status: 'new',
+  },
+];
+
+let adminUploads: StoredUpload[] = [...seedUploads];
+let adminFeedbacks: StoredFeedback[] = [...seedFeedbacks];
+
+// STEP 2: READ AND CLEAN (Gemini call #1) - Supports single file or multiple files
 app.post('/api/clean-document', async (req, res) => {
   try {
-    const { documentText, pdfBase64, fileName, fileType } = req.body;
+    const { documentText, pdfBase64, fileName, fileType, files } = req.body;
 
-    if (pdfBase64) {
-      const approxBytes = (pdfBase64.length * 3) / 4;
-      if (approxBytes > 20 * 1024 * 1024) {
+    // Check if multiple files were provided
+    const fileList: Array<{
+      fileName: string;
+      fileType: string;
+      fileSize?: number;
+      documentText?: string;
+      pdfBase64?: string;
+    }> = Array.isArray(files) && files.length > 0
+      ? files
+      : (documentText || pdfBase64)
+      ? [{ fileName: fileName || 'document', fileType: fileType || 'text/plain', documentText, pdfBase64 }]
+      : [];
+
+    if (fileList.length === 0) {
+      return res.status(400).json({ error: 'No document content provided. Please upload at least one document.' });
+    }
+
+    // Validate size of individual files
+    for (const f of fileList) {
+      if (f.pdfBase64) {
+        const approxBytes = (f.pdfBase64.length * 3) / 4;
+        if (approxBytes > 20 * 1024 * 1024) {
+          return res.status(400).json({
+            error: `File "${f.fileName}" is larger than 20MB. Please choose documents under 20MB.`,
+          });
+        }
+      } else if (f.documentText && f.documentText.length > 500000) {
         return res.status(400).json({
-          error: 'This PDF is larger than 20MB. Please choose a smaller document so we can process it calmly.',
+          error: `File "${f.fileName}" is over 100,000 words. Please provide a shorter document.`,
         });
       }
-    } else if (documentText) {
-      if (documentText.length > 500000) {
-        return res.status(400).json({
-          error: 'This document is over 100,000 words. Please provide a shorter document for a calm, easy study course.',
-        });
-      }
-      if (!documentText.trim()) {
-        return res.status(400).json({ error: 'The document appears to be empty.' });
-      }
-    } else {
-      return res.status(400).json({ error: 'No document content provided.' });
     }
 
     const cleanPrompt = `You are a text preparation and cleaning engine for a calm study course.
@@ -100,34 +203,40 @@ RULES FOR CLEANING:
    - If the document names a person, company, or brand only as a side example, leave the name out and use neutral words like "one example" or "one organization".
    - If a name is the main idea/subject of the document, keep it exactly as the document says.
    - Never introduce any outside brand, company, or model names.
-4. Return a list of anything unreadable or left out (images, charts, unclear parts). This becomes the Skipped Content Log.
-5. Provide the exact first sentence and exact last sentence of the cleaned text.
-6. Use low temperature (0.2). Return JSON matching the schema.`;
+4. MULTIPLE DOCUMENTS RULE:
+   ${fileList.length > 1 ? `The user uploaded ${fileList.length} documents (${fileList.map((f) => f.fileName).join(', ')}). Harmonize and clean all of them into a coherent curriculum. Provide an overarching documentTitle that unifies the topics.` : ''}
+5. Return a list of anything unreadable or left out (images, charts, unclear parts). This becomes the Skipped Content Log.
+6. Provide the exact first sentence and exact last sentence of the cleaned text.
+7. Use low temperature (0.2). Return JSON matching the schema.`;
 
-    let contentsPayload: any;
-    if (pdfBase64) {
-      contentsPayload = [
-        {
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: 'application/pdf', data: pdfBase64 } },
-            { text: cleanPrompt },
-          ],
-        },
-      ];
+    const parts: any[] = [];
+
+    if (fileList.length === 1) {
+      const single = fileList[0];
+      if (single.pdfBase64) {
+        parts.push({ inlineData: { mimeType: 'application/pdf', data: single.pdfBase64 } });
+        parts.push({ text: cleanPrompt });
+      } else {
+        parts.push({ text: `${cleanPrompt}\n\nORIGINAL DOCUMENT TEXT:\n${single.documentText}` });
+      }
     } else {
-      contentsPayload = [
-        {
-          role: 'user',
-          parts: [
-            { text: `${cleanPrompt}\n\nORIGINAL DOCUMENT TEXT:\n${documentText}` },
-          ],
-        },
-      ];
+      // Multiple files
+      parts.push({ text: cleanPrompt });
+      for (let idx = 0; idx < fileList.length; idx++) {
+        const item = fileList[idx];
+        if (item.pdfBase64) {
+          parts.push({ inlineData: { mimeType: 'application/pdf', data: item.pdfBase64 } });
+          parts.push({ text: `[Source Document ${idx + 1} of ${fileList.length}: "${item.fileName}"]` });
+        } else if (item.documentText) {
+          parts.push({
+            text: `=== SOURCE DOCUMENT ${idx + 1} of ${fileList.length}: "${item.fileName}" ===\n${item.documentText}\n=== END OF DOCUMENT ${idx + 1} ===\n`,
+          });
+        }
+      }
     }
 
     const response = await generateContentWithFallback({
-      contents: contentsPayload,
+      contents: [{ role: 'user', parts }],
       config: {
         temperature: 0.2,
         responseMimeType: 'application/json',
@@ -149,21 +258,187 @@ RULES FOR CLEANING:
     });
 
     const parsed = JSON.parse(response.text || '{}');
-    const cleaned = parsed.cleanedText || documentText || '';
+    const cleaned = parsed.cleanedText || fileList.map((f) => f.documentText || '').join('\n\n') || '';
+    const resolvedTitle = parsed.documentTitle || fileList.map((f) => f.fileName.replace(/\.[^/.]+$/, '')).join(' & ') || 'Study Course';
 
     res.json({
-      documentTitle: parsed.documentTitle || fileName?.replace(/\.[^/.]+$/, '') || 'Your Document',
+      documentTitle: resolvedTitle,
       cleanedText: cleaned,
       skippedContent: Array.isArray(parsed.skippedContent) ? parsed.skippedContent : [],
       firstSentence: parsed.firstSentence || '',
       lastSentence: parsed.lastSentence || '',
+      fileCount: fileList.length,
+      fileNames: fileList.map((f) => f.fileName),
     });
   } catch (error: any) {
     console.error('Error in /api/clean-document:', error);
     res.status(500).json({
-      error: error.message || 'Failed to read and clean your document. Please try again.',
+      error: error.message || 'Failed to read and clean your document(s). Please try again.',
     });
   }
+});
+
+// RECORD UPLOAD EVENT (Invoked when a course is generated)
+app.post('/api/record-upload', (req, res) => {
+  try {
+    const {
+      documentTitle,
+      fileNames,
+      fileTypes,
+      totalSize,
+      sectionCount,
+      contentSnippet,
+      fullCleanedText,
+      skippedItems,
+      userId,
+      userEmail,
+    } = req.body;
+
+    const newRecord: StoredUpload = {
+      id: `upload_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      documentTitle: documentTitle || 'Untitled Course',
+      fileNames: Array.isArray(fileNames) && fileNames.length > 0 ? fileNames : ['Document'],
+      fileTypes: Array.isArray(fileTypes) ? fileTypes : ['text/plain'],
+      totalSize: totalSize || 0,
+      totalWordsEstimate: fullCleanedText ? Math.round(fullCleanedText.split(/\s+/).length) : 500,
+      sectionCount: sectionCount || 1,
+      uploadedAt: new Date().toISOString(),
+      userId: userId || 'user_guest',
+      userEmail: userEmail || 'itsalineabigail@gmail.com',
+      contentSnippet: contentSnippet || (fullCleanedText ? fullCleanedText.slice(0, 200) + '...' : ''),
+      fullCleanedText: fullCleanedText || '',
+      skippedItems: Array.isArray(skippedItems) ? skippedItems : [],
+    };
+
+    adminUploads.unshift(newRecord);
+    res.json({ success: true, record: newRecord, totalUploads: adminUploads.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Failed to record upload' });
+  }
+});
+
+// SUBMIT FEEDBACK
+app.post('/api/feedback', (req, res) => {
+  try {
+    const { rating, sentiment, category, message, userEmail, userName } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: 'Please enter a feedback message.' });
+    }
+
+    const newFeedback: StoredFeedback = {
+      id: `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      rating: rating || 5,
+      sentiment: sentiment || 'great',
+      category: category || 'other',
+      message: message.trim(),
+      userEmail: userEmail || 'itsalineabigail@gmail.com',
+      userName: userName || 'Student',
+      submittedAt: new Date().toISOString(),
+      status: 'new',
+    };
+
+    adminFeedbacks.unshift(newFeedback);
+    res.json({ success: true, feedback: newFeedback, totalFeedbacks: adminFeedbacks.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Failed to submit feedback' });
+  }
+});
+
+// GET FEEDBACK LIST
+app.get('/api/feedback', (req, res) => {
+  res.json({ feedbacks: adminFeedbacks, count: adminFeedbacks.length });
+});
+
+// ADMIN DATA PORTAL ENDPOINT
+app.get('/api/admin/data', (req, res) => {
+  // Aggregate user profiles from upload history and feedback
+  const userMap = new Map<string, {
+    id: string;
+    email: string;
+    name: string;
+    role: 'student' | 'creator' | 'admin';
+    firstSeen: string;
+    lastActive: string;
+    uploadCount: number;
+    lessonsCompleted: number;
+    deviceType: string;
+    browser: string;
+  }>();
+
+  // Primary user from metadata
+  userMap.set('itsalineabigail@gmail.com', {
+    id: 'usr_abigail_prime',
+    email: 'itsalineabigail@gmail.com',
+    name: 'Aline Abigail',
+    role: 'student',
+    firstSeen: new Date(Date.now() - 3600 * 1000 * 48).toISOString(),
+    lastActive: new Date().toISOString(),
+    uploadCount: adminUploads.filter((u) => u.userEmail === 'itsalineabigail@gmail.com').length,
+    lessonsCompleted: 8,
+    deviceType: 'Desktop (Chrome/Linux)',
+    browser: 'Chrome 122.0',
+  });
+
+  // Creator profile
+  userMap.set('hamzarashid3214@gmail.com', {
+    id: 'usr_creator_hamza',
+    email: 'hamzarashid3214@gmail.com',
+    name: 'Hamza Rashid K',
+    role: 'creator',
+    firstSeen: new Date(Date.now() - 3600 * 1000 * 240).toISOString(),
+    lastActive: new Date().toISOString(),
+    uploadCount: 12,
+    lessonsCompleted: 45,
+    deviceType: 'Workstation',
+    browser: 'Chrome 124.0',
+  });
+
+  // Map any other users from uploads
+  for (const up of adminUploads) {
+    if (up.userEmail && !userMap.has(up.userEmail)) {
+      userMap.set(up.userEmail, {
+        id: `usr_${up.userId || 'guest'}`,
+        email: up.userEmail,
+        name: up.userEmail.split('@')[0],
+        role: 'student',
+        firstSeen: up.uploadedAt,
+        lastActive: up.uploadedAt,
+        uploadCount: 1,
+        lessonsCompleted: up.sectionCount,
+        deviceType: 'Web Client',
+        browser: 'Modern Browser',
+      });
+    }
+  }
+
+  const users = Array.from(userMap.values());
+
+  const totalFilesProcessed = adminUploads.reduce((acc, u) => acc + (u.fileNames?.length || 1), 0);
+  const totalSectionsCreated = adminUploads.reduce((acc, u) => acc + (u.sectionCount || 0), 0);
+
+  res.json({
+    stats: {
+      totalUploads: adminUploads.length,
+      totalFiles: totalFilesProcessed,
+      totalSections: totalSectionsCreated,
+      totalUsers: users.length,
+      totalFeedbacks: adminFeedbacks.length,
+      averageRating: adminFeedbacks.length > 0
+        ? (adminFeedbacks.reduce((acc, f) => acc + f.rating, 0) / adminFeedbacks.length).toFixed(1)
+        : '5.0',
+    },
+    uploads: adminUploads,
+    feedbacks: adminFeedbacks,
+    users,
+  });
+});
+
+// CLEAR ADMIN LOGS
+app.post('/api/admin/clear-logs', (req, res) => {
+  adminUploads = [];
+  adminFeedbacks = [];
+  res.json({ success: true, message: 'Admin upload and feedback history cleared' });
 });
 
 // STEP 3: PLAN AND MERGE (Gemini call #2)

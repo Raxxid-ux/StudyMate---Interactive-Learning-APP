@@ -1,17 +1,37 @@
 import React, { useState } from 'react';
-import { BookOpen, Moon, Sun, PlusCircle, AlertCircle, Layers, Award, FileSpreadsheet, Settings, Menu, X } from './icons.tsx';
+import {
+  BookOpen,
+  Moon,
+  Sun,
+  PlusCircle,
+  AlertCircle,
+  Layers,
+  Award,
+  FileSpreadsheet,
+  Settings,
+  Menu,
+  X,
+  MessageCircle,
+  Timer,
+  Zap,
+} from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
+import { PomodoroTimer } from './PomodoroTimer.tsx';
+import { SessionAudioPlayer } from './SessionAudioPlayer.tsx';
 import type { CourseData, MistakeRecord } from '../types.ts';
 
 interface NavbarProps {
   course: CourseData | null;
-  activeTab: 'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit';
-  setActiveTab: (tab: 'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit') => void;
+  activeTab: 'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit' | 'exam-prep';
+  setActiveTab: (tab: 'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit' | 'exam-prep') => void;
   mistakes: MistakeRecord[];
   onNewDocumentClick: () => void;
   completedSectionCount: number;
   onOpenMemo?: () => void;
   onOpenSettings?: () => void;
+  onOpenFeedback?: () => void;
+  onOpenPomodoro?: () => void;
+  onOpenStudyPrep?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -23,14 +43,38 @@ export const Navbar: React.FC<NavbarProps> = ({
   completedSectionCount,
   onOpenMemo,
   onOpenSettings,
+  onOpenFeedback,
+  onOpenPomodoro,
+  onOpenStudyPrep,
 }) => {
-  const { theme, toggleTheme, textSize, increaseTextSize, decreaseTextSize } = useThemeAndText();
+  const {
+    theme,
+    toggleTheme,
+    textSize,
+    increaseTextSize,
+    decreaseTextSize,
+    language,
+    toggleLanguage,
+    t,
+  } = useThemeAndText();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#12151B]/95 backdrop-blur border-b border-zinc-200/80 dark:border-zinc-800 transition-colors w-full">
+    <header
+      className={`sticky top-0 z-40 backdrop-blur border-b transition-colors w-full ${
+        theme === 'academia'
+          ? 'bg-[#FAF6EE]/95 dark:bg-[#191512]/95 border-[#E2D6C5] dark:border-[#382E25]'
+          : 'bg-white/95 dark:bg-[#12151B]/95 border-zinc-200/80 dark:border-zinc-800'
+      }`}
+    >
       {/* Top Bar: Brand Logo & Top Controls */}
-      <div className="w-full px-3.5 sm:px-6 lg:px-8 border-b border-zinc-100 dark:border-zinc-800/60">
+      <div
+        className={`w-full px-3.5 sm:px-6 lg:px-8 border-b ${
+          theme === 'academia'
+            ? 'border-[#EAE0D0] dark:border-[#2C241D]'
+            : 'border-zinc-100 dark:border-zinc-800/60'
+        }`}
+      >
         <div className="flex items-center justify-between h-14 sm:h-15 gap-2 sm:gap-4">
           {/* StudyMate Title & Brand */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
@@ -39,13 +83,46 @@ export const Navbar: React.FC<NavbarProps> = ({
               alt="StudyMate Logo"
               className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-contain shadow-xs border border-zinc-200/80 dark:border-zinc-700/80 bg-white"
             />
-            <span className="font-bold text-[#1A6EF0] dark:text-[#64B5F6] tracking-tight text-base sm:text-lg whitespace-nowrap">
+            <span
+              className={`font-bold tracking-tight text-base sm:text-lg whitespace-nowrap ${
+                theme === 'academia'
+                  ? 'font-serif-scholar text-[#1E3A2F] dark:text-[#E8F0EC]'
+                  : 'text-[#1A6EF0] dark:text-[#64B5F6]'
+              }`}
+            >
               StudyMate
             </span>
           </div>
 
           {/* Top Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Background Focus Audio Player (Frequencies & Lo-Fi Beats) */}
+            <SessionAudioPlayer />
+
+            {/* Pomodoro Timer Compact Widget */}
+            <PomodoroTimer compact={true} onOpenFull={onOpenPomodoro} />
+
+            {/* Language Switcher Button (English / മലയാളം) */}
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className={`h-8.5 sm:h-9 px-2 sm:px-2.5 inline-flex items-center justify-center rounded-xl text-xs font-bold border transition-colors shadow-2xs cursor-pointer ${
+                theme === 'academia'
+                  ? 'bg-[#F2ECE1] dark:bg-[#251F18] border-[#DECFC0] dark:border-[#382E25] text-[#5A4B3E] dark:text-[#E2D5C3] hover:border-[#C5A059]'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-200 dark:hover:bg-zinc-700 border-zinc-200/80 dark:border-zinc-700/80'
+              }`}
+              title={
+                language === 'en'
+                  ? 'മലയാളത്തിലേക്ക് മാറ്റുക (Switch to Malayalam)'
+                  : 'Switch to English'
+              }
+              aria-label="Toggle language"
+            >
+              <span className="text-[11px] font-semibold">
+                {language === 'en' ? 'മലയാളം' : 'English'}
+              </span>
+            </button>
+
             {/* Desktop-only font scaling widget */}
             <div className="hidden sm:flex h-8.5 sm:h-9 items-center bg-zinc-100 dark:bg-zinc-800 rounded-xl px-1 border border-zinc-200/80 dark:border-zinc-700/80 shadow-2xs">
               <button
@@ -73,15 +150,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Dark / Light Mode (Always accessible) */}
+            {/* Dark / Light / Theme Toggle Button (Always accessible) */}
             <button
               type="button"
               onClick={toggleTheme}
               className="w-8.5 h-8.5 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700/80 transition-colors shadow-2xs cursor-pointer"
-              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              aria-label="Toggle theme"
+              title={`Active Theme: ${theme}. Click to cycle themes`}
+              aria-label="Cycle theme"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 shrink-0" /> : <Moon className="w-4 h-4 shrink-0" />}
+              {theme === 'cosmic' || theme === 'high-contrast' ? (
+                <Sun className="w-4 h-4 shrink-0" />
+              ) : (
+                <Moon className="w-4 h-4 shrink-0" />
+              )}
             </button>
 
             {/* Desktop Settings & About Creator */}
@@ -90,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 type="button"
                 onClick={onOpenSettings}
                 className="hidden sm:inline-flex h-8.5 sm:h-9 px-2.5 sm:px-3 items-center justify-center gap-1.5 rounded-xl text-xs font-semibold border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:border-[#1A6EF0] dark:hover:border-[#64B5F6] transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
-                title="StudyMate Settings & About Creator"
+                title="StudyMate Settings, ADHD Tools & About Creator"
                 aria-label="Open Settings"
               >
                 <Settings className="w-3.5 h-3.5 shrink-0 text-zinc-500 dark:text-zinc-400" />
@@ -108,6 +189,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse shrink-0" />
                 <span className="leading-none">Memo</span>
+              </button>
+            )}
+
+            {/* Desktop Feedback Button */}
+            {onOpenFeedback && (
+              <button
+                type="button"
+                onClick={onOpenFeedback}
+                className="hidden sm:inline-flex h-8.5 sm:h-9 px-2.5 sm:px-3 items-center justify-center gap-1.5 rounded-xl text-xs font-semibold border border-rose-200 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 hover:bg-rose-100/80 dark:hover:bg-rose-900/40 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+                title="Share suggestions & feedback"
+                aria-label="Feedback"
+              >
+                <MessageCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                <span className="hidden md:inline leading-none">Feedback</span>
               </button>
             )}
 
@@ -154,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Sub-Row: Course Views (Lessons, Flashcards, Review Mistakes, Final Quiz, Content Audit) */}
+      {/* Sub-Row: Course Views (Lessons, Flashcards, Review Mistakes, Final Quiz, Content Audit, Exam Prep) */}
       {course && (
         <div className="w-full bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-xs py-2 px-3 sm:px-6 lg:px-8 overflow-x-auto no-scrollbar">
           <nav
@@ -171,7 +266,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <BookOpen className="w-3.5 h-3.5 shrink-0" />
-              <span className="leading-none">Lessons</span>
+              <span className="leading-none">{t.lessons}</span>
               <span className="text-[11px] opacity-75 font-normal tabular-nums leading-none">
                 ({completedSectionCount}/{course.sections.length})
               </span>
@@ -187,7 +282,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
-              <span className="leading-none">Flashcards</span>
+              <span className="leading-none">{t.flashcards}</span>
             </button>
 
             <button
@@ -200,7 +295,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span className="leading-none">Review Mistakes</span>
+              <span className="leading-none">{t.reviewMistakes}</span>
               {mistakes.length > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#B5F55A] text-[#1F410B] tabular-nums leading-none">
                   {mistakes.length}
@@ -218,7 +313,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Award className="w-3.5 h-3.5 shrink-0" />
-              <span className="leading-none">Final Quiz</span>
+              <span className="leading-none">{t.finalQuiz}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('exam-prep')}
+              className={`h-8 sm:h-8.5 px-3 rounded-xl text-xs font-semibold transition-all inline-flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeTab === 'exam-prep'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'text-[#5F6573] dark:text-[#A6ACB9] hover:text-[#3A3F4F] dark:hover:text-[#F1F3F7] hover:bg-white/60 dark:hover:bg-zinc-800/60'
+              }`}
+              title="Rapid Active-Recall & Fast Memorization Exam Drills"
+            >
+              <Zap className="w-3.5 h-3.5 shrink-0" />
+              <span className="leading-none">{t.examPrep}</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 uppercase tracking-wider">
+                Fast
+              </span>
             </button>
 
             <button
@@ -231,7 +343,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <FileSpreadsheet className="w-3.5 h-3.5 shrink-0" />
-              <span className="leading-none">Content Audit</span>
+              <span className="leading-none">{t.contentAudit}</span>
             </button>
           </nav>
         </div>
@@ -273,7 +385,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Quick Tools Row (Font Scaling & 3D Memo) */}
+            {/* Quick Tools Row (Font Scaling & Pomodoro) */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               {/* Font scaling widget */}
               <div className="flex items-center justify-between p-2.5 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/80">
@@ -303,24 +415,42 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* Memo 3D Companion */}
-              {onOpenMemo && (
+              {/* Pomodoro Focus Open */}
+              {onOpenPomodoro && (
                 <button
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    onOpenMemo();
+                    onOpenPomodoro();
                   }}
-                  className="flex items-center justify-between p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold cursor-pointer shadow-2xs"
+                  className="flex items-center justify-between p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-semibold cursor-pointer shadow-2xs"
                 >
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse shrink-0" />
-                    <span>3D Memo</span>
+                    <Timer className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Pomodoro</span>
                   </span>
-                  <span className="text-[10px] opacity-75 font-normal">Chat</span>
+                  <span className="text-[10px] opacity-75 font-normal">Pacing</span>
                 </button>
               )}
             </div>
+
+            {/* Memo 3D Companion Shortcut in Mobile */}
+            {onOpenMemo && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenMemo();
+                }}
+                className="w-full text-left p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center justify-between cursor-pointer shadow-2xs"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#22D08B] animate-pulse shrink-0" />
+                  <span>Ask Memo (3D Tutor Companion)</span>
+                </span>
+                <span className="text-[10px] opacity-75 font-normal">Chat</span>
+              </button>
+            )}
 
             {/* Settings & Creator Link */}
             {onOpenSettings && (
@@ -334,9 +464,27 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <span className="flex items-center gap-2">
                   <Settings className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                  <span>Settings & About Creator</span>
+                  <span>Settings, ADHD & About Creator</span>
                 </span>
                 <span className="text-[10px] text-zinc-400 font-normal">Hamza Rashid K</span>
+              </button>
+            )}
+
+            {/* Mobile Feedback Link */}
+            {onOpenFeedback && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenFeedback();
+                }}
+                className="w-full text-left p-3 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 text-xs font-semibold text-rose-700 dark:text-rose-300 flex items-center justify-between hover:bg-rose-100/60 dark:hover:bg-rose-900/30 transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 text-rose-500" />
+                  <span>Share Feedback & Suggestions</span>
+                </span>
+                <span className="text-[10px] text-rose-400 font-medium">Improve</span>
               </button>
             )}
 
@@ -424,6 +572,27 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="flex items-center gap-2">
                     <Award className="w-3.5 h-3.5" />
                     <span>Final Quiz</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('exam-prep');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full text-left p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer transition-colors ${
+                    activeTab === 'exam-prep'
+                      ? 'bg-amber-500 text-white shadow-xs'
+                      : 'text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>Exam Prep (Fast Memorization)</span>
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 uppercase">
+                    Drills
                   </span>
                 </button>
 
