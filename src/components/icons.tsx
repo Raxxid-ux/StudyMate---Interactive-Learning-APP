@@ -605,6 +605,10 @@ export const Coffee: React.FC<IconProps> = ({ className, size, ...rest }) => (
   </svg>
 );
 
-
-
-
+export const Layout: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9H21" />
+    <path d="M9 21V9" />
+  </svg>
+);

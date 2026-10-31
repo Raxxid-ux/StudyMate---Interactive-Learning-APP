@@ -318,29 +318,14 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 flex-wrap">
+                <div className="flex items-center gap-1.5">
                   <h3 className="font-semibold text-sm sm:text-base text-[#3A3F4F] dark:text-slate-100 leading-tight">
                     Memo
                   </h3>
-                  {memoHalloweenTheme ? (
-                    <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border border-orange-400 bg-orange-100/80 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300">
-                      HALLOWEEN
-                    </span>
-                  ) : (
-                    <span className="text-[9px] tracking-wider font-semibold uppercase px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400">
-                      STUDY DRAFT
-                    </span>
-                  )}
-                  <span
-                    className={`w-2 h-2 rounded-full animate-pulse shrink-0 ${
-                      memoHalloweenTheme ? 'bg-[#FF6B00]' : 'bg-[#22D08B]'
-                    }`}
-                  />
+                  <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse shrink-0" />
                 </div>
                 <p className="text-xs text-[#5F6573] dark:text-slate-400 truncate">
-                  {memoHalloweenTheme
-                    ? 'Witch Hat & Vampire Teeth Active'
-                    : currentSection
+                  {currentSection
                     ? currentSection.title
                     : 'Ready to clear doubts & help you configure'}
                 </p>
@@ -348,8 +333,9 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
             </div>
 
             {/* Action buttons on the right - cleanly aligned, cannot overflow */}
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0 ml-2">
               <button
+                type="button"
                 onClick={() =>
                   onUpdateStudyConfig({ audioFeedback: !studyConfig.audioFeedback })
                 }
@@ -365,6 +351,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
               </button>
 
               <button
+                type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-8 h-8 items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden sm:flex cursor-pointer shrink-0"
                 title={isExpanded ? 'Restore window size' : 'Expand window'}
@@ -377,13 +364,15 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                 )}
               </button>
 
+              {/* Close button - high contrast, prominent, never pushed off screen */}
               <button
+                type="button"
                 onClick={toggleOpen}
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 transition-colors cursor-pointer shrink-0 shadow-2xs"
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 hover:text-rose-600 hover:bg-rose-50 dark:text-slate-200 dark:hover:bg-rose-950/60 dark:hover:text-rose-400 border border-slate-300 dark:border-slate-700 transition-all cursor-pointer shrink-0 shadow-2xs"
                 title="Close Memo"
                 aria-label="Close Memo"
               >
-                <X className="w-4 h-4 stroke-[2.2]" />
+                <X className="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
           </div>

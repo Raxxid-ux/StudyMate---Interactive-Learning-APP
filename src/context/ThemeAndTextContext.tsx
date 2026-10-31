@@ -12,6 +12,7 @@ import { TRANSLATIONS, type AppLanguage, type Translations } from '../utils/tran
 export type TextSize = 'normal' | 'large' | 'xlarge';
 export type AppTheme = 'meadow' | 'aurora' | 'cosmic' | 'sepia' | 'high-contrast' | 'academia';
 export type SupportStyle = 'calm' | 'structured' | 'gentle' | 'reflective' | 'direct';
+export type UiDensity = 'classic' | 'compact' | 'minimal';
 
 interface ThemeAndTextContextType {
   // Theme Controls
@@ -19,6 +20,11 @@ interface ThemeAndTextContextType {
   setTheme: (theme: AppTheme) => void;
   isDark: boolean;
   toggleTheme: () => void;
+
+  // UI Density Mode (Classic, Compact, Minimal UI for reducing stress/overload)
+  uiDensity: UiDensity;
+  setUiDensity: (density: UiDensity) => void;
+  cycleUiDensity: () => void;
 
   // Language (English & Simple Malayalam)
   language: AppLanguage;
@@ -67,18 +73,46 @@ interface ThemeAndTextContextType {
 const ThemeAndTextContext = createContext<ThemeAndTextContextType | undefined>(undefined);
 
 export const ThemeAndTextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1. Theme State (Meadow Sage is benchmark, supports Aurora, Cosmic, Sepia, High-Contrast, and Dark Academia)
+  // 1. Theme State (Meadow Sage is benchmark default, supports Aurora, Cosmic, Sepia, High-Contrast, and Dark Academia)
   const [theme, setThemeState] = useState<AppTheme>(() => {
     try {
       const saved = localStorage.getItem('studymate_theme_v2');
       if (saved && ['meadow', 'aurora', 'cosmic', 'sepia', 'high-contrast', 'academia'].includes(saved)) {
         return saved as AppTheme;
       }
-      return 'academia'; // Default to gorgeous Dark Academia Scholar theme requested
+      return 'meadow'; // Default is Meadow Sage benchmark
     } catch {
-      return 'academia';
+      return 'meadow';
     }
   });
+
+  // 2. UI Density State ('classic' | 'compact' | 'minimal') to prevent user stress with options
+  const [uiDensity, setUiDensityState] = useState<UiDensity>(() => {
+    try {
+      const saved = localStorage.getItem('studymate_ui_density');
+      if (saved === 'minimal' || saved === 'compact' || saved === 'classic') return saved;
+      return 'classic';
+    } catch {
+      return 'classic';
+    }
+  });
+
+  const cycleUiDensity = () => {
+    setUiDensityState((prev) => {
+      const next = prev === 'classic' ? 'compact' : prev === 'compact' ? 'minimal' : 'classic';
+      try {
+        localStorage.setItem('studymate_ui_density', next);
+      } catch {}
+      return next;
+    });
+  };
+
+  const setUiDensity = (density: UiDensity) => {
+    setUiDensityState(density);
+    try {
+      localStorage.setItem('studymate_ui_density', density);
+    } catch {}
+  };
 
   // 2. Language State (English & Simple Malayalam)
   const [language, setLanguageState] = useState<AppLanguage>(() => {
@@ -325,6 +359,9 @@ export const ThemeAndTextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setTheme: setThemeState,
         isDark,
         toggleTheme,
+        uiDensity,
+        setUiDensity,
+        cycleUiDensity,
         language,
         setLanguage: setLanguageState,
         toggleLanguage,

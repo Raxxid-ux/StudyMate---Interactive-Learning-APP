@@ -40,6 +40,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [clickCount, setClickCount] = useState(0);
+  const [webglSupported, setWebglSupported] = useState(true);
 
   // References across render loop
   const stateRef = useRef({
@@ -67,6 +68,20 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
+    // RENDERER SETUP WITH SAFE FALLBACK
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance',
+      });
+    } catch (err) {
+      console.warn('WebGL initialization failed, falling back to 2.5D animated vector Memo', err);
+      setWebglSupported(false);
+      return;
+    }
+
     // SCENE SETUP
     const scene = new THREE.Scene();
 
@@ -76,12 +91,6 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
     camera.position.set(0, 0.4, 5.2);
 
-    // RENDERER SETUP
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -91,6 +100,15 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.display = 'block';
     container.appendChild(renderer.domElement);
+
+    // Initial resize sync on next frame
+    const syncRaf = requestAnimationFrame(() => {
+      if (container && container.clientWidth > 0 && container.clientHeight > 0) {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+    });
 
     // PROCEDURAL DIGITAL VISOR FACE TEXTURE
     const faceCanvas = document.createElement('canvas');
@@ -917,12 +935,75 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div
-        ref={containerRef}
-        onClick={handleClick}
-        className="w-full h-full cursor-pointer relative"
-        title="Tap Memo to interact or ask a question!"
-      />
+      {webglSupported ? (
+        <div
+          ref={containerRef}
+          onClick={handleClick}
+          className="w-full h-full cursor-pointer relative"
+          title="Tap Memo to interact or ask a question!"
+        />
+      ) : (
+        <div
+          onClick={handleClick}
+          className="w-full h-full cursor-pointer relative flex flex-col items-center justify-center p-3 animate-pulse"
+          title="Tap Memo to emote!"
+        >
+          {/* 2.5D Stylus Body Vector Illustration */}
+          <svg viewBox="0 0 160 220" className="w-32 h-44 drop-shadow-xl">
+            {/* Ambient Aura */}
+            <circle
+              cx="80"
+              cy="95"
+              r="60"
+              fill={halloweenTheme ? 'rgba(255, 107, 0, 0.18)' : 'rgba(34, 208, 139, 0.18)'}
+            />
+
+            {/* Witch Hat if Halloween */}
+            {halloweenTheme && (
+              <g className="transition-all">
+                {/* Wide Brim */}
+                <ellipse cx="80" cy="56" rx="55" ry="11" fill="#1C1328" stroke="#3D2952" strokeWidth="2" />
+                {/* Cone Base */}
+                <path d="M48 56 Q80 20 80 8 Q80 20 112 56 Z" fill="#1C1328" stroke="#3D2952" strokeWidth="2" />
+                {/* Crooked Tip */}
+                <path d="M78 12 Q80 8 72 2 Q78 4 82 12 Z" fill="#1C1328" />
+                <circle cx="72" cy="2" r="3" fill="#F59E0B" />
+                {/* Orange Ribbon */}
+                <ellipse cx="80" cy="52" rx="34" ry="7" fill="#FF6B00" />
+                {/* Gold Buckle */}
+                <rect x="74" y="47" width="12" height="10" rx="2" fill="#F59E0B" />
+                <rect x="77" y="50" width="6" height="4" rx="1" fill="#1C1328" />
+              </g>
+            )}
+
+            {/* Ceramic Stylus Barrel Body */}
+            <rect x="62" y="60" width="36" height="90" rx="10" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="2.5" />
+
+            {/* Glowing Digital Visor Face */}
+            <rect x="66" y="80" width="28" height="32" rx="6" fill="#0A111E" stroke={halloweenTheme ? '#FF6B00' : '#22D08B'} strokeWidth="1.5" />
+
+            {/* Eyes */}
+            <circle cx="74" cy="94" r="3" fill={halloweenTheme ? '#FF9E00' : '#22D08B'} />
+            <circle cx="86" cy="94" r="3" fill={halloweenTheme ? '#FF9E00' : '#22D08B'} />
+
+            {/* Vampire Fangs if Halloween */}
+            {halloweenTheme && (
+              <g fill="#FFFFFF" stroke="#FF6B00" strokeWidth="0.5">
+                <polygon points="72,102 75,102 73.5,107" />
+                <polygon points="85,102 88,102 86.5,107" />
+              </g>
+            )}
+
+            {/* Stylus Grip & Silver Nib */}
+            <polygon points="65,150 95,150 84,185 76,185" fill="#E2E8F0" />
+            <polygon points="76,185 84,185 80,205" fill="#94A3B8" />
+            <circle cx="80" cy="205" r="2" fill="#64748B" />
+          </svg>
+          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 mt-1">
+            Memo Interactive Companion
+          </span>
+        </div>
+      )}
 
       {showControlsOverlay && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full shadow-sm text-xs font-medium text-slate-600 dark:text-slate-300 pointer-events-none">

@@ -78,6 +78,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     toggleMemoHalloweenTheme,
     language,
     setLanguage,
+    uiDensity,
+    setUiDensity,
     t,
   } = useThemeAndText();
 
@@ -125,6 +127,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     previewText: string;
   }> = [
     {
+      id: 'meadow',
+      name: 'Meadow Sage',
+      subtitle: 'Soft airy base, calm sage green, pristine reading',
+      badge: 'Default',
+      previewBg: 'bg-[#F3F7F3]',
+      previewAccent: 'bg-[#22C55E]',
+      previewText: 'text-[#213327]',
+    },
+    {
       id: 'academia',
       name: 'Dark Academia',
       subtitle: 'Warm scholar parchment, deep antique wood, and gold leaf',
@@ -132,15 +143,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       previewBg: 'bg-[#F7F4EC]',
       previewAccent: 'bg-[#C5A059]',
       previewText: 'text-[#2D251E]',
-    },
-    {
-      id: 'meadow',
-      name: 'Meadow Sage',
-      subtitle: 'Soft airy base, calm sage green, pristine reading',
-      badge: 'Benchmark',
-      previewBg: 'bg-[#F3F7F3]',
-      previewAccent: 'bg-[#22C55E]',
-      previewText: 'text-[#213327]',
     },
     {
       id: 'aurora',
@@ -331,6 +333,94 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* UI View Mode & Density: Minimal UI, Compact, Classic */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      UI Layout & Density
+                    </h3>
+                    <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                      Reduces visual clutter to avoid stress and decision fatigue
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    Low Stress
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUiDensity('minimal');
+                      playSoftTap(studyConfig.audioFeedback);
+                    }}
+                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                      uiDensity === 'minimal'
+                        ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/30 shadow-xs'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                        Minimal UI
+                      </span>
+                      {uiDensity === 'minimal' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                    </div>
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-snug">
+                      Low distraction. Hides secondary tracker banners for peaceful focus.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUiDensity('compact');
+                      playSoftTap(studyConfig.audioFeedback);
+                    }}
+                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                      uiDensity === 'compact'
+                        ? 'border-[#1A6EF0] bg-blue-50/60 dark:bg-blue-950/30 shadow-xs'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                        Compact
+                      </span>
+                      {uiDensity === 'compact' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
+                    </div>
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-snug">
+                      Condensed padding and tighter spacing for dense reading.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUiDensity('classic');
+                      playSoftTap(studyConfig.audioFeedback);
+                    }}
+                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                      uiDensity === 'classic'
+                        ? 'border-[#1A6EF0] bg-blue-50/60 dark:bg-blue-950/30 shadow-xs'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                        Classic
+                      </span>
+                      {uiDensity === 'classic' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
+                    </div>
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-snug">
+                      Full view with circular progress gauge and quick action cards.
+                    </p>
+                  </button>
                 </div>
               </div>
 

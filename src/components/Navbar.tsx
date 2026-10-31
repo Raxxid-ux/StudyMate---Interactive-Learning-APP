@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Timer,
   Zap,
+  Layout,
 } from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import { PomodoroTimer } from './PomodoroTimer.tsx';
@@ -53,8 +54,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     textSize,
     increaseTextSize,
     decreaseTextSize,
-    language,
-    toggleLanguage,
+    uiDensity,
+    cycleUiDensity,
     t,
   } = useThemeAndText();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -95,31 +96,40 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Top Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Background Focus Audio Player (Frequencies & Lo-Fi Beats) */}
-            <SessionAudioPlayer />
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Background Focus Audio Player (Desktop & Tablet) */}
+            <div className="hidden sm:flex items-center">
+              <SessionAudioPlayer />
+            </div>
 
-            {/* Pomodoro Timer Compact Widget */}
-            <PomodoroTimer compact={true} onOpenFull={onOpenPomodoro} />
+            {/* Pomodoro Timer Compact Widget (Desktop & Tablet) */}
+            <div className="hidden sm:flex items-center">
+              <PomodoroTimer compact={true} onOpenFull={onOpenPomodoro} />
+            </div>
 
-            {/* Language Switcher Button (English / മലയാളം) */}
+            {/* UI View Mode Button (Minimal UI / Compact / Classic) - decreases user stress and options */}
             <button
               type="button"
-              onClick={toggleLanguage}
-              className={`h-8.5 sm:h-9 px-2 sm:px-2.5 inline-flex items-center justify-center rounded-xl text-xs font-bold border transition-colors shadow-2xs cursor-pointer ${
-                theme === 'academia'
-                  ? 'bg-[#F2ECE1] dark:bg-[#251F18] border-[#DECFC0] dark:border-[#382E25] text-[#5A4B3E] dark:text-[#E2D5C3] hover:border-[#C5A059]'
+              onClick={cycleUiDensity}
+              className={`h-8.5 sm:h-9 px-2.5 sm:px-3 inline-flex items-center justify-center gap-1.5 rounded-xl text-xs font-semibold border transition-all shadow-2xs cursor-pointer ${
+                uiDensity === 'minimal'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 shadow-xs'
+                  : uiDensity === 'compact'
+                  ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-200 dark:hover:bg-zinc-700 border-zinc-200/80 dark:border-zinc-700/80'
               }`}
-              title={
-                language === 'en'
-                  ? 'മലയാളത്തിലേക്ക് മാറ്റുക (Switch to Malayalam)'
-                  : 'Switch to English'
-              }
-              aria-label="Toggle language"
+              title={`View Mode: ${
+                uiDensity === 'minimal'
+                  ? 'Minimal UI (Low-distraction calm reading mode)'
+                  : uiDensity === 'compact'
+                  ? 'Compact UI (Condensed layout)'
+                  : 'Classic UI (Full overview)'
+              }. Click to switch view.`}
+              aria-label="Toggle UI view density"
             >
-              <span className="text-[11px] font-semibold">
-                {language === 'en' ? 'മലയാളം' : 'English'}
+              <Layout className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              <span className="hidden xs:inline">
+                {uiDensity === 'minimal' ? 'Minimal UI' : uiDensity === 'compact' ? 'Compact' : 'Classic'}
               </span>
             </button>
 
@@ -432,6 +442,25 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="text-[10px] opacity-75 font-normal">Pacing</span>
                 </button>
               )}
+            </div>
+
+            {/* Focus Audio Player Row in Mobile Drawer */}
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/80">
+              <span className="text-xs font-semibold text-[#5F6573] dark:text-[#A6ACB9]">Focus Music</span>
+              <SessionAudioPlayer />
+            </div>
+
+            {/* UI View Mode Row in Mobile Drawer */}
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/80">
+              <span className="text-xs font-semibold text-[#5F6573] dark:text-[#A6ACB9]">View Mode</span>
+              <button
+                type="button"
+                onClick={cycleUiDensity}
+                className="px-3 py-1 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-700 text-[#1A6EF0] dark:text-[#64B5F6] border border-zinc-200/80 dark:border-zinc-600 shadow-2xs cursor-pointer flex items-center gap-1"
+              >
+                <Layout className="w-3.5 h-3.5 opacity-80" />
+                <span>{uiDensity === 'minimal' ? 'Minimal UI' : uiDensity === 'compact' ? 'Compact' : 'Classic'}</span>
+              </button>
             </div>
 
             {/* Memo 3D Companion Shortcut in Mobile */}

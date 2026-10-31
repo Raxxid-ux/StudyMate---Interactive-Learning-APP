@@ -142,7 +142,7 @@ export const ExamPrepView: React.FC<ExamPrepViewProps> = ({ course, onJumpToLess
     : 80;
 
   return (
-    <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8 animate-fadeIn">
+    <div className="flex-1 w-full max-w-4xl mx-auto px-4 pt-8 pb-36 sm:px-6 lg:px-8 space-y-8 animate-fadeIn">
       {/* Top Banner: Exam Readiness Gauge */}
       <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-500/10 via-amber-500/10 to-emerald-500/10 dark:from-blue-950/30 dark:via-amber-950/20 dark:to-emerald-950/30 border border-amber-300/60 dark:border-amber-800/60 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-5">
         <div className="flex items-center gap-4">

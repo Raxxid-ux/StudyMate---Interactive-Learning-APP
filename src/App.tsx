@@ -37,7 +37,7 @@ const STORAGE_PROGRESS_KEY = 'lfmd_active_progress_v2';
 const STORAGE_CONFIG_KEY = 'memo_study_config_v1';
 
 export function AppContent() {
-  const { fontSizeClass, setTextSize, setTheme } = useThemeAndText();
+  const { fontSizeClass, setTextSize, setTheme, theme, uiDensity } = useThemeAndText();
 
   // Study Configuration State (used across lessons, settings, and Memo companion)
   const [studyConfig, setStudyConfig] = useState<StudyConfiguration>(() => {
@@ -445,8 +445,8 @@ export function AppContent() {
         contentSnippet: cleanData!.cleanedText ? cleanData!.cleanedText.slice(0, 240) + '...' : '',
         fullCleanedText: cleanData!.cleanedText,
         skippedItems: cleanData!.skippedContent || [],
-        userId: 'usr_abigail_prime',
-        userEmail: 'itsalineabigail@gmail.com',
+        userId: 'usr_scholar_active',
+        userEmail: 'alex.scholar@example.com',
       };
 
       fetch('/api/record-upload', {
@@ -676,7 +676,13 @@ export function AppContent() {
             onOpenFeedback={() => setIsFeedbackOpen(true)}
           />
         ) : (
-          <div className="flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-4rem)] lg:overflow-hidden bg-[#FAF6EE] dark:bg-[#0E1117]">
+          <div
+            className={`flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-4rem)] lg:overflow-hidden transition-colors ${
+              theme === 'academia'
+                ? 'bg-[#FAF6EE] dark:bg-[#0E1117]'
+                : 'bg-[#F3F7F3] dark:bg-[#0E1117]'
+            }`}
+          >
             {/* Mobile View: Collapsible Lesson Dropdown Selector at Top */}
             {activeTab === 'lesson' && (
               <Sidebar
@@ -841,7 +847,7 @@ export function AppContent() {
       <FeedbackModal
         isOpen={isFeedbackOpen}
         onClose={() => setIsFeedbackOpen(false)}
-        defaultEmail="itsalineabigail@gmail.com"
+        defaultEmail=""
         audioEnabled={studyConfig.audioFeedback}
       />
 

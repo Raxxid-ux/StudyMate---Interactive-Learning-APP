@@ -402,7 +402,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                         {users.length || 2}
                       </div>
                       <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] font-medium">
-                        Primary: itsalineabigail
+                        Active Scholars & Learners
                       </div>
                     </div>
 

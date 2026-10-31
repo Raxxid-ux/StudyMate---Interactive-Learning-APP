@@ -30,7 +30,7 @@ interface FeedbackModalProps {
 export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   isOpen,
   onClose,
-  defaultEmail = 'itsalineabigail@gmail.com',
+  defaultEmail = '',
   audioEnabled = true,
 }) => {
   const [rating, setRating] = useState<number>(5);
@@ -83,7 +83,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
       sentiment,
       category,
       message: message.trim(),
-      userEmail: userEmail.trim() || 'itsalineabigail@gmail.com',
+      userEmail: userEmail.trim() || defaultEmail || 'student@studymate.app',
       userName: userName.trim() || 'StudyMate Student',
       submittedAt: new Date().toISOString(),
       status: 'new',
@@ -318,7 +318,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                 type="email"
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
-                placeholder="your.email@example.com"
+                placeholder="alex.scholar@example.com"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white text-xs focus:outline-hidden focus:border-[#1A6EF0]"
               />
             </div>
