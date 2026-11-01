@@ -24,40 +24,20 @@
     color: #F1F3F7;
   }
 
-  /* THEME 1: MEADOW SAGE (Benchmark theme - soft, calm, optimistic, airy, safe, refined) */
+  /* THEME 1: MEADOW SAGE (Default benchmark - soft, calm, airy, safe, refined sage palette with accessible contrast) */
   html[data-theme="meadow"] body {
-    background-color: #F3F7F3;
-    color: #213327;
+    background-color: #F4F7F4;
+    color: #1A2E22;
   }
   html[data-theme="meadow"].dark body {
-    background-color: #0F1712;
+    background-color: #0E1611;
     color: #ECFDF5;
   }
 
-  /* THEME 2: AURORA DAYLIGHT */
-  html[data-theme="aurora"] body {
-    background-color: #F8FAFC;
-    color: #1E293B;
-  }
-  html[data-theme="aurora"].dark body {
-    background-color: #0F172A;
-    color: #F8FAFC;
-  }
-
-  /* THEME 3: COSMIC MIDNIGHT */
+  /* THEME 2: COSMIC MIDNIGHT */
   html[data-theme="cosmic"] body {
     background-color: #0C1017;
     color: #F1F5F9;
-  }
-
-  /* THEME 4: SEPIA WARM PAPER (Zero Blue Light, Anti-Glare) */
-  html[data-theme="sepia"] body {
-    background-color: #FBF7EE;
-    color: #362B20;
-  }
-  html[data-theme="sepia"].dark body {
-    background-color: #1F1912;
-    color: #F5EADB;
   }
 
   /* THEME 5: HIGH CONTRAST FOCUS (Maximum Legibility, Zero Distraction) */
@@ -176,4 +156,71 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Professional 3D website grade ease-in animation for Greetings heading */
+@keyframes greetingsEaseIn3D {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) translateY(36px) rotateX(16deg) scale(0.92);
+    filter: blur(8px);
+  }
+  60% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(900px) translateY(0) rotateX(0deg) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.greetings-3d-entrance {
+  animation: greetingsEaseIn3D 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+  transform-origin: center bottom;
+}
+
+/* Memo smooth motion around Greetings heading and settling in place */
+@keyframes memoFlyAroundGreetings {
+  0% {
+    opacity: 0;
+    transform: translate(-120px, -15px) scale(0.5) rotate(-24deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-60px, 45px) scale(0.9) rotate(-10deg);
+  }
+  48% {
+    transform: translate(45px, 50px) scale(1.08) rotate(14deg);
+  }
+  72% {
+    transform: translate(75px, 15px) scale(0.96) rotate(-4deg);
+  }
+  88% {
+    transform: translate(45px, 4px) scale(1.02) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(28px, 10px) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes memoPerpetualFloat {
+  0%, 100% {
+    transform: translate(28px, 10px) translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translate(28px, 10px) translateY(-6px) rotate(2deg);
+  }
+}
+
+.memo-orbit-flight {
+  animation: memoFlyAroundGreetings 2.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.memo-orbit-settled {
+  animation: memoPerpetualFloat 3.6s ease-in-out infinite;
+  will-change: transform;
 }

@@ -20,6 +20,7 @@ import {
   FileText,
   BookOpen,
   Type,
+  Sliders,
 } from './icons.tsx';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import type { Section, Question, QuizAnswer, StudyConfiguration } from '../types.ts';
@@ -60,6 +61,9 @@ export const LessonView: React.FC<LessonViewProps> = ({
 }) => {
   const {
     fontSizeClass,
+    textSize,
+    increaseTextSize,
+    decreaseTextSize,
     bionicReading,
     toggleBionicReading,
     readingRuler,
@@ -75,6 +79,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
   const [showSimplerWording, setShowSimplerWording] = useState(false);
   const [showOriginalText, setShowOriginalText] = useState(false);
   const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
+  const [isReadingToolsOpen, setIsReadingToolsOpen] = useState(false);
 
   // Bionic reading word transformation helper
   const renderFormattedText = (text: string) => {
@@ -158,83 +163,166 @@ export const LessonView: React.FC<LessonViewProps> = ({
             )}
           </div>
 
-          {/* Neurodivergent Reading Toolkit Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {/* Bionic Reading Toggle */}
+          {/* Compact Reading Tools Menu */}
+          <div className="relative">
             <button
               type="button"
-              onClick={toggleBionicReading}
-              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
-                bionicReading
-                  ? 'bg-[#1A6EF0] text-white border-[#1A6EF0] shadow-2xs'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+              onClick={() => setIsReadingToolsOpen(!isReadingToolsOpen)}
+              className={`h-8.5 px-3 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs ${
+                bionicReading || readingRuler || singleChunkFocus || dyslexicFont || showSimplerWording
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200'
+                  : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700'
               }`}
-              title="Bionic Reading (Bolds initial recognition letters for ADHD & fast reading)"
+              title="Reading aids: Bionic, Ruler, ADHD Focus, Dyslexia Font, Simpler Wording"
+              aria-expanded={isReadingToolsOpen}
+              aria-label="Reading tools"
             >
-              <span className="font-bold">Bio</span>nic
-            </button>
-
-            {/* Reading Ruler Toggle */}
-            <button
-              type="button"
-              onClick={toggleReadingRuler}
-              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
-                readingRuler
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
-              }`}
-              title="Reading Ruler (Horizontal focus guide that follows cursor)"
-            >
-              Ruler
-            </button>
-
-            {/* ADHD Single-Chunk Focus */}
-            <button
-              type="button"
-              onClick={toggleSingleChunkFocus}
-              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
-                singleChunkFocus
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
-              }`}
-              title="ADHD Low-Stimulus Mode (Isolates single chunk to prevent distraction)"
-            >
-              ADHD Focus
-            </button>
-
-            {/* Dyslexia Font Toggle */}
-            <button
-              type="button"
-              onClick={toggleDyslexicFont}
-              className={`h-8 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
-                dyslexicFont
-                  ? 'bg-amber-600 text-white border-amber-600 shadow-2xs'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
-              }`}
-              title="Dyslexia High-Legibility Font (Lexend weighted baseline)"
-            >
-              Dyslexia Font
-            </button>
-
-            {/* Simpler wording button */}
-            <button
-              type="button"
-              onClick={handleTogglePlainWords}
-              disabled={isFetchingPlainWords}
-              className={`h-8 px-2.5 inline-flex items-center justify-center gap-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
-                showSimplerWording
-                  ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700'
-                  : 'bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/60'
-              }`}
-              title="Read simpler wording without outside facts"
-            >
-              {isFetchingPlainWords ? (
-                <RefreshCw className="w-3 h-3 animate-spin text-amber-600 shrink-0" />
-              ) : (
-                <Type className="w-3 h-3 text-amber-500 shrink-0" />
+              <Sliders className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              <span>Reading tools</span>
+              {(bionicReading || readingRuler || singleChunkFocus || dyslexicFont || showSimplerWording) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
               )}
-              <span>{showSimplerWording ? 'Study Chunks' : 'Plain Words'}</span>
             </button>
+
+            {/* Reading Tools Popover Menu */}
+            {isReadingToolsOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setIsReadingToolsOpen(false)}
+                  aria-hidden="true"
+                />
+                <div className="absolute right-0 top-10 z-40 w-72 p-3 bg-white dark:bg-[#1A1E27] rounded-2xl border border-zinc-200/90 dark:border-zinc-700/90 shadow-xl space-y-2 animate-fadeIn text-xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">Reading Tools</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsReadingToolsOpen(false)}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-0.5 rounded cursor-pointer"
+                      aria-label="Close reading tools"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Simpler Wording */}
+                  <button
+                    type="button"
+                    onClick={handleTogglePlainWords}
+                    disabled={isFetchingPlainWords}
+                    className={`w-full p-2 rounded-xl text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      showSimplerWording
+                        ? 'bg-amber-100/70 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200 font-semibold'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">Plain Words</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400">Simpler vocabulary without jargon</div>
+                    </div>
+                    {isFetchingPlainWords ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600" />
+                    ) : showSimplerWording ? (
+                      <Check className="w-4 h-4 text-amber-600" />
+                    ) : null}
+                  </button>
+
+                  {/* Bionic Reading */}
+                  <button
+                    type="button"
+                    onClick={toggleBionicReading}
+                    className={`w-full p-2 rounded-xl text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      bionicReading
+                        ? 'bg-emerald-100/70 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200 font-semibold'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">Bionic Reading</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400">Bolds initial letters for fast ADHD scanning</div>
+                    </div>
+                    {bionicReading && <Check className="w-4 h-4 text-emerald-600" />}
+                  </button>
+
+                  {/* Reading Ruler */}
+                  <button
+                    type="button"
+                    onClick={toggleReadingRuler}
+                    className={`w-full p-2 rounded-xl text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      readingRuler
+                        ? 'bg-emerald-100/70 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200 font-semibold'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">Reading Ruler</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400">Focus line follows cursor position</div>
+                    </div>
+                    {readingRuler && <Check className="w-4 h-4 text-emerald-600" />}
+                  </button>
+
+                  {/* Single Chunk Focus */}
+                  <button
+                    type="button"
+                    onClick={toggleSingleChunkFocus}
+                    className={`w-full p-2 rounded-xl text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      singleChunkFocus
+                        ? 'bg-purple-100/70 text-purple-900 dark:bg-purple-950/50 dark:text-purple-200 font-semibold'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">ADHD Low-Stimulus Mode</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400">Dims earlier paragraphs to prevent distraction</div>
+                    </div>
+                    {singleChunkFocus && <Check className="w-4 h-4 text-purple-600" />}
+                  </button>
+
+                  {/* Dyslexia Font */}
+                  <button
+                    type="button"
+                    onClick={toggleDyslexicFont}
+                    className={`w-full p-2 rounded-xl text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      dyslexicFont
+                        ? 'bg-amber-100/70 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200 font-semibold'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">Dyslexia High-Legibility Font</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400">Weighted baselines to reduce letter-swapping</div>
+                    </div>
+                    {dyslexicFont && <Check className="w-4 h-4 text-amber-600" />}
+                  </button>
+
+                  {/* Text Size Controls */}
+                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <span className="text-zinc-500 dark:text-zinc-400">Text Size</span>
+                    <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={decreaseTextSize}
+                        disabled={textSize === 'normal'}
+                        className="px-2 py-0.5 rounded text-xs font-bold text-zinc-700 dark:text-zinc-300 disabled:opacity-30 cursor-pointer hover:bg-white dark:hover:bg-zinc-700"
+                      >
+                        A-
+                      </button>
+                      <span className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 px-1">
+                        {textSize === 'normal' ? '1x' : textSize === 'large' ? '1.2x' : '1.4x'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={increaseTextSize}
+                        disabled={textSize === 'xlarge'}
+                        className="px-2 py-0.5 rounded text-xs font-bold text-zinc-700 dark:text-zinc-300 disabled:opacity-30 cursor-pointer hover:bg-white dark:hover:bg-zinc-700"
+                      >
+                        A+
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

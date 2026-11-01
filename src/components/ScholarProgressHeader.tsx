@@ -345,7 +345,7 @@ export const ScholarProgressHeader: React.FC<ScholarProgressHeaderProps> = ({
           >
             <CheckCircle2
               className={`w-3.5 h-3.5 ${
-                theme === 'academia' ? 'text-[#8C6239] dark:text-[#D4AF37]' : 'text-emerald-500'
+                theme === 'academia' ? 'text-[#8C6239] dark:text-[#D4AF37]' : 'text-blue-500'
               }`}
             />
             <span>{t.startQuiz}</span>

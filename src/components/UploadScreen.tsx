@@ -20,10 +20,14 @@ import {
   PlusCircle,
   FilePlus,
   MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  Lightbulb,
 } from './icons.tsx';
 import { SAMPLE_DOCUMENTS, type SampleDoc } from '../sampleDocuments.ts';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
 import { MemoThreeCanvas } from './MemoThreeCanvas.tsx';
+import { playCalmChime } from '../utils/audioChimes.ts';
 import type { UploadedFileItem } from '../types.ts';
 
 interface UploadScreenProps {
@@ -59,6 +63,72 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [isReadingFiles, setIsReadingFiles] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Memo flight animation state around the Greetings heading
+  const [isMemoFlightSettled, setIsMemoFlightSettled] = useState(false);
+  const [memoGreetingMood, setMemoGreetingMood] = useState<'idle' | 'happy' | 'celebrate'>('happy');
+
+  useEffect(() => {
+    const flightTimer = setTimeout(() => {
+      setIsMemoFlightSettled(true);
+      setMemoGreetingMood('idle');
+    }, 2800);
+    return () => clearTimeout(flightTimer);
+  }, []);
+
+  // Rotating body contents with tips, tricks, and Did you know facts (no em dashes)
+  const HOME_ROTATING_MESSAGES = [
+    {
+      type: 'intro',
+      label: 'Interactive Course',
+      text: 'StudyMate turns single or multiple documents into a short, calm, easy study course with Memo, your 3D interactive companion.',
+    },
+    {
+      type: 'tip',
+      label: 'Study Tip',
+      text: 'Short 20 minute reading sessions help your brain lock in concepts without cognitive fatigue.',
+    },
+    {
+      type: 'fact',
+      label: 'Did You Know?',
+      text: 'Did you know? Testing your recall right after reading a section can double your long term retention.',
+    },
+    {
+      type: 'trick',
+      label: 'Focus Trick',
+      text: 'If a paragraph feels dense, toggle the Reading Tools popover to try Bionic Reading or plain wording.',
+    },
+    {
+      type: 'fact',
+      label: 'Did You Know?',
+      text: 'Did you know? Taking a quick 5 minute walk resets your dopamine receptors and restores working memory.',
+    },
+    {
+      type: 'trick',
+      label: 'Pro Tip',
+      text: 'You can select multiple documents at once. StudyMate cleans and synthesizes them into one clear curriculum.',
+    },
+    {
+      type: 'tip',
+      label: 'Study Tip',
+      text: 'Keep a water bottle nearby. Even minor hydration drops can slow down mental processing speed.',
+    },
+  ];
+
+  const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0);
+  const [isSubFade, setIsSubFade] = useState(true);
+
+  useEffect(() => {
+    if (isProcessing || isReadingFiles) return;
+    const subInterval = setInterval(() => {
+      setIsSubFade(false);
+      setTimeout(() => {
+        setCurrentSubtitleIndex((prev) => (prev + 1) % HOME_ROTATING_MESSAGES.length);
+        setIsSubFade(true);
+      }, 250);
+    }, 5500);
+    return () => clearInterval(subInterval);
+  }, [isProcessing, isReadingFiles]);
 
   // Motivational Quotes, Cognitive Facts & Study Tips
   const motivators = [
@@ -302,23 +372,123 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
       <div className="w-full max-w-3xl mx-auto space-y-8">
         {/* Intro Heading with normal font, animated gradient on Greetings, and subheading */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center px-3 py-1 rounded-full border border-[#1A6EF0]/30 bg-[#1A6EF0]/5 text-[10px] tracking-widest font-bold uppercase text-[#1A6EF0] dark:text-[#64B5F6]">
-            <span>STUDYMATE · INTERACTIVE LEARNING</span>
-          </div>
+          {/* Greetings Heading with 3D website-grade ease-in and Memo gliding around it */}
+          <div className="relative inline-block max-w-full my-3 sm:my-5 py-2 sm:py-3 px-4 sm:px-6">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-normal tracking-tight leading-[1.15] greetings-3d-entrance select-none min-h-[4rem] sm:min-h-[5.5rem] lg:min-h-[7rem] flex items-center justify-center">
+              <span className="heading-gradient-animated inline-block font-normal pb-1">
+                Greetings
+              </span>
+            </h1>
 
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-normal tracking-tight leading-tight">
-            <span className="heading-gradient-animated inline-block font-normal">
-              Greetings,
-            </span>
-          </h1>
+            {/* Memo 3D Companion gliding around Greetings and settling gracefully */}
+            <div
+              className={`absolute -top-3 -right-12 sm:-top-5 sm:-right-16 pointer-events-auto z-20 transition-all ${
+                isMemoFlightSettled ? 'memo-orbit-settled' : 'memo-orbit-flight'
+              }`}
+              style={{ width: '110px', height: '125px' }}
+              title="Memo · Your 3D Study Companion (Tap to cheer!)"
+              onClick={() => {
+                playCalmChime(true);
+                setMemoGreetingMood('celebrate');
+                setTimeout(() => setMemoGreetingMood('idle'), 2500);
+              }}
+            >
+              <div className="w-[110px] h-[125px] cursor-pointer relative group">
+                <MemoThreeCanvas
+                  size="compact"
+                  mood={memoGreetingMood}
+                  interactive={false}
+                  soundEnabled={true}
+                />
+                {isMemoFlightSettled && (
+                  <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-white dark:bg-zinc-800 text-[10px] font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 shadow-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    Hi! Tap me
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight leading-snug">
             What would you like to learn today?
           </h2>
 
-          <p className="text-[#5F6573] dark:text-[#A6ACB9] text-sm sm:text-base max-w-lg mx-auto leading-relaxed pt-1">
-            StudyMate turns single or multiple documents into a short, calm, easy study course with Memo, your 3D interactive companion.
-          </p>
+          {/* Dynamic rotating body contents with tips, tricks, and Did you know facts (no em dashes) */}
+          <div className="max-w-xl mx-auto pt-1">
+            <div
+              className={`min-h-[56px] flex flex-col items-center justify-center transition-opacity duration-300 ${
+                isSubFade ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 text-[11px] font-semibold mb-1.5 shadow-2xs">
+                <Lightbulb className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span>{HOME_ROTATING_MESSAGES[currentSubtitleIndex].label}</span>
+              </div>
+              <p className="text-[#5F6573] dark:text-[#A6ACB9] text-sm sm:text-base leading-relaxed text-center px-4">
+                {HOME_ROTATING_MESSAGES[currentSubtitleIndex].text}
+              </p>
+            </div>
+
+            {/* Subtle pagination dots & manual navigation controls */}
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSubFade(false);
+                  setTimeout(() => {
+                    setCurrentSubtitleIndex((prev) =>
+                      prev === 0 ? HOME_ROTATING_MESSAGES.length - 1 : prev - 1
+                    );
+                    setIsSubFade(true);
+                  }, 180);
+                }}
+                className="w-5 h-5 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                title="Previous tip"
+                aria-label="Previous tip"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="flex items-center gap-1.5">
+                {HOME_ROTATING_MESSAGES.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    type="button"
+                    onClick={() => {
+                      setIsSubFade(false);
+                      setTimeout(() => {
+                        setCurrentSubtitleIndex(dotIdx);
+                        setIsSubFade(true);
+                      }, 180);
+                    }}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      currentSubtitleIndex === dotIdx
+                        ? 'w-5 bg-[#1A6EF0]'
+                        : 'w-1.5 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400'
+                    }`}
+                    title={`Go to item ${dotIdx + 1}`}
+                    aria-label={`Go to item ${dotIdx + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSubFade(false);
+                  setTimeout(() => {
+                    setCurrentSubtitleIndex((prev) => (prev + 1) % HOME_ROTATING_MESSAGES.length);
+                    setIsSubFade(true);
+                  }, 180);
+                }}
+                className="w-5 h-5 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                title="Next tip"
+                aria-label="Next tip"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Upload Box Container */}
@@ -349,16 +519,25 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 </p>
               </div>
 
-              {/* Informative Progress Stages Roadmap */}
+              {/* Clean, Honest Curriculum Progress State */}
               <div className="bg-white/80 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 sm:p-5 space-y-3.5 shadow-2xs">
-                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                <div className="flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   <span className="uppercase tracking-wider">Curriculum Pipeline</span>
                   <span className="tabular-nums font-mono text-[#1A6EF0] dark:text-[#64B5F6]">
-                    Stage {activeStageIndex + 1} of {stages.length}
+                    Step {activeStageIndex + 1} of {stages.length}
                   </span>
                 </div>
 
-                <div className="space-y-2.5">
+                {/* Honest Linear Progress Bar */}
+                <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#1A6EF0] h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${Math.round(((activeStageIndex + 0.5) / stages.length) * 100)}%` }}
+                  />
+                </div>
+
+                {/* Stages List: collapsed completed details by default */}
+                <div className="space-y-2 pt-1">
                   {stages.map((stg, sIndex) => {
                     const isDone = sIndex < activeStageIndex;
                     const isCurrent = sIndex === activeStageIndex;
@@ -369,15 +548,15 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                         key={stg.id}
                         className={`flex items-start gap-3 p-2.5 rounded-xl transition-all ${
                           isCurrent
-                            ? 'bg-[#1A6EF0]/5 dark:bg-[#1A6EF0]/10 border border-[#1A6EF0]/30 shadow-2xs'
+                            ? 'bg-blue-50/70 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-800 shadow-2xs'
                             : isDone
-                            ? 'opacity-85'
+                            ? 'bg-zinc-50/50 dark:bg-zinc-800/30 border border-transparent opacity-75'
                             : 'opacity-40'
                         }`}
                       >
                         <div className="mt-0.5 shrink-0">
                           {isDone ? (
-                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                            <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                             </div>
                           ) : isCurrent ? (
@@ -385,7 +564,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                               <RefreshCw className="w-3 h-3" />
                             </div>
                           ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-400">
+                            <div className="w-5 h-5 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-400">
                               {sIndex + 1}
                             </div>
                           )}
@@ -394,98 +573,38 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between">
                             <span
-                              className={`text-xs font-bold ${
+                              className={`text-xs font-semibold ${
                                 isCurrent
-                                  ? 'text-[#1A6EF0] dark:text-[#64B5F6]'
+                                  ? 'text-[#1A6EF0] dark:text-blue-300'
                                   : isDone
-                                  ? 'text-zinc-800 dark:text-zinc-200'
-                                  : 'text-zinc-500 dark:text-zinc-400'
+                                  ? 'text-zinc-700 dark:text-zinc-300'
+                                  : 'text-zinc-400 dark:text-zinc-500'
                               }`}
                             >
                               {stg.title}
                             </span>
                             {isDone && (
-                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                                Complete
+                              <span className="text-[10px] text-blue-700 dark:text-blue-400 font-medium">
+                                Ready
                               </span>
                             )}
                             {isCurrent && (
-                              <span className="text-[10px] text-[#1A6EF0] dark:text-[#64B5F6] font-semibold animate-pulse">
-                                Processing...
+                              <span className="text-[10px] text-[#006A4E] dark:text-emerald-300 font-medium animate-pulse">
+                                Working...
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] leading-snug mt-0.5">
-                            {stg.desc}
-                          </p>
+                          {/* Collapse completed stage descriptions to reduce cognitive clutter */}
+                          {isCurrent && (
+                            <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] leading-snug mt-0.5">
+                              {stg.desc}
+                            </p>
+                          )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-              </div>
-
-              {/* ROTATING MOTIVATIONAL QUOTES, TIPS & FACTS */}
-              <div
-                className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-                  theme === 'academia'
-                    ? 'bg-[#F2ECE1] dark:bg-[#251F18] border-[#DECFC0] dark:border-[#3A3025]'
-                    : 'bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-emerald-50/70 dark:from-slate-800/80 dark:to-slate-850/80 border-blue-200/60 dark:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                        activeMotivator.type === 'quote'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                          : activeMotivator.type === 'fact'
-                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
-                          : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                      }`}
-                    >
-                      {activeMotivator.type === 'quote'
-                        ? t.quoteLabel
-                        : activeMotivator.type === 'fact'
-                        ? t.factLabel
-                        : t.tipLabel}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      {motivatorIndex + 1} of {motivators.length}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setMotivatorIndex((p) => (p - 1 + motivators.length) % motivators.length)
-                      }
-                      className="w-6 h-6 rounded-lg bg-white/80 dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-white flex items-center justify-center transition-colors text-xs font-bold cursor-pointer"
-                      title="Previous quote"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMotivatorIndex((p) => (p + 1) % motivators.length)}
-                      className="w-6 h-6 rounded-lg bg-white/80 dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-white flex items-center justify-center transition-colors text-xs font-bold cursor-pointer"
-                      title="Next quote"
-                    >
-                      ›
-                    </button>
-                  </div>
-                </div>
-
-                <p
-                  className={`text-xs sm:text-sm leading-relaxed ${
-                    theme === 'academia'
-                      ? 'font-serif-scholar italic text-[#3E3227] dark:text-[#EAE0D3]'
-                      : 'text-slate-800 dark:text-slate-200'
-                  }`}
-                >
-                  {language === 'ml' ? activeMotivator.textMl : activeMotivator.text}
-                </p>
               </div>
             </div>
           ) : errorMessage ? (

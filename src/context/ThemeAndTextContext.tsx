@@ -10,7 +10,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TRANSLATIONS, type AppLanguage, type Translations } from '../utils/translations.ts';
 
 export type TextSize = 'normal' | 'large' | 'xlarge';
-export type AppTheme = 'meadow' | 'aurora' | 'cosmic' | 'sepia' | 'high-contrast' | 'academia';
+export type AppTheme = 'meadow' | 'cosmic' | 'high-contrast' | 'academia';
 export type SupportStyle = 'calm' | 'structured' | 'gentle' | 'reflective' | 'direct';
 export type UiDensity = 'classic' | 'compact' | 'minimal';
 
@@ -77,7 +77,7 @@ export const ThemeAndTextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [theme, setThemeState] = useState<AppTheme>(() => {
     try {
       const saved = localStorage.getItem('studymate_theme_v2');
-      if (saved && ['meadow', 'aurora', 'cosmic', 'sepia', 'high-contrast', 'academia'].includes(saved)) {
+      if (saved && ['meadow', 'cosmic', 'high-contrast', 'academia'].includes(saved)) {
         return saved as AppTheme;
       }
       return 'meadow'; // Default is Meadow Sage benchmark
@@ -320,12 +320,10 @@ export const ThemeAndTextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const toggleTheme = () => {
     setThemeState((prev) => {
-      if (prev === 'academia') return 'meadow';
-      if (prev === 'meadow') return 'aurora';
-      if (prev === 'aurora') return 'cosmic';
-      if (prev === 'cosmic') return 'sepia';
-      if (prev === 'sepia') return 'high-contrast';
-      return 'academia';
+      if (prev === 'meadow') return 'cosmic';
+      if (prev === 'cosmic') return 'high-contrast';
+      if (prev === 'high-contrast') return 'academia';
+      return 'meadow';
     });
   };
 

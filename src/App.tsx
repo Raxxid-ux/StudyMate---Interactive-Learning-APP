@@ -5,22 +5,21 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ThemeAndTextProvider, useThemeAndText } from './context/ThemeAndTextContext.tsx';
-import { Navbar } from './components/Navbar.tsx';
+import { Navbar, type MainNavDestination } from './components/Navbar.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
 import { UploadScreen } from './components/UploadScreen.tsx';
 import { LessonView } from './components/LessonView.tsx';
-import { ReviewMistakesView } from './components/ReviewMistakesView.tsx';
-import { FlashcardsView } from './components/FlashcardsView.tsx';
-import { FinalQuizView } from './components/FinalQuizView.tsx';
+import { PracticeHub } from './components/PracticeHub.tsx';
+import { PlannerView } from './components/PlannerView.tsx';
+import { LibraryView } from './components/LibraryView.tsx';
 import { ContentAuditLedger } from './components/ContentAuditLedger.tsx';
-import { ExamPrepView } from './components/ExamPrepView.tsx';
 import { PomodoroTimer } from './components/PomodoroTimer.tsx';
 import { MemoChatbot } from './components/MemoChatbot.tsx';
 import { SettingsModal } from './components/SettingsModal.tsx';
 import { AdminPanelModal } from './components/AdminPanelModal.tsx';
 import { FeedbackModal } from './components/FeedbackModal.tsx';
 import { StudyGuidePrepModal } from './components/StudyGuidePrepModal.tsx';
-import { ScholarProgressHeader } from './components/ScholarProgressHeader.tsx';
+import { Headphones, CheckCircle2, ArrowRight } from './components/icons.tsx';
 import { playCalmChime, playSoftTap } from './utils/audioChimes.ts';
 import type {
   CourseData,
@@ -110,7 +109,14 @@ export function AppContent() {
     }
   });
 
-  const [activeTab, setActiveTab] = useState<'lesson' | 'flashcards' | 'mistakes' | 'final-quiz' | 'audit' | 'exam-prep'>('lesson');
+  const [activeNav, setActiveNav] = useState<MainNavDestination>('learn');
+  const [readinessBannerDismissed, setReadinessBannerDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('studymate_readiness_dismissed') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
   // Progress State
@@ -430,8 +436,8 @@ export function AppContent() {
       setMistakes([]);
       setCurrentSectionIndex(0);
       setIsProcessing(false);
-      setActiveTab('lesson');
-      setIsStudyPrepOpen(true); // Automatically show Study Guide Tips after loading!
+      setActiveNav('learn');
+      // Non-blocking readiness prompt banner is shown instead of interrupting with a forced modal
 
       // Record upload in Admin store & localStorage for administrative inspection
       const uploadRecord = {
@@ -635,7 +641,7 @@ export function AppContent() {
     setSectionAnswers({});
     setMistakes([]);
     setCurrentSectionIndex(0);
-    setActiveTab('lesson');
+    setActiveNav('learn');
     setShowNewDocConfirm(false);
     setCleanedDocCache(null);
     setPlannedSectionsCache(null);
@@ -651,14 +657,16 @@ export function AppContent() {
     <div className="min-h-screen w-full bg-[#EDF0F5] dark:bg-[#12151B] text-[#3A3F4F] dark:text-[#F1F3F7] flex flex-col font-sans antialiased transition-colors overflow-x-hidden">
       <Navbar
         course={isProcessing ? null : course}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        mistakes={mistakes}
-        onNewDocumentClick={() => setShowNewDocConfirm(true)}
+        activeNav={activeNav}
+        setActiveNav={setActiveNav}
+        mistakesCount={mistakes.length}
         completedSectionCount={completedSectionIndices.length}
+        totalSections={course?.sections.length || 0}
+        onNewDocumentClick={() => setShowNewDocConfirm(true)}
         onOpenMemo={() => setIsMemoOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenFeedback={() => setIsFeedbackOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
         onOpenPomodoro={() => setIsPomodoroOpen(true)}
         onOpenStudyPrep={() => setIsStudyPrepOpen(true)}
       />
@@ -677,14 +685,14 @@ export function AppContent() {
           />
         ) : (
           <div
-            className={`flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-4rem)] lg:overflow-hidden transition-colors ${
+            className={`flex-1 w-full flex flex-col lg:flex-row min-h-0 lg:h-[calc(100vh-3.75rem)] lg:overflow-hidden transition-colors ${
               theme === 'academia'
                 ? 'bg-[#FAF6EE] dark:bg-[#0E1117]'
-                : 'bg-[#F3F7F3] dark:bg-[#0E1117]'
+                : 'bg-[#F4F7F4] dark:bg-[#0E1117]'
             }`}
           >
             {/* Mobile View: Collapsible Lesson Dropdown Selector at Top */}
-            {activeTab === 'lesson' && (
+            {activeNav === 'learn' && (
               <Sidebar
                 course={course}
                 currentSectionIndex={currentSectionIndex}
@@ -697,7 +705,7 @@ export function AppContent() {
             )}
 
             {/* Desktop View: Dedicated Left Panel (Course Sections, 3D Memo & Key Notes) */}
-            {activeTab === 'lesson' && (
+            {activeNav === 'learn' && (
               <Sidebar
                 course={course}
                 currentSectionIndex={currentSectionIndex}
@@ -709,22 +717,50 @@ export function AppContent() {
               />
             )}
 
-            {/* Main Lesson Content Area: Flexible, scrollable, pristine reading layout */}
-            <div className="flex-1 min-h-0 w-full h-full overflow-y-auto bg-transparent flex flex-col p-3.5 sm:p-6 lg:p-8">
-              {/* Scholar Progress & Habit Trackers Header matching reference image */}
-              <ScholarProgressHeader
-                completedCount={completedSectionIndices.length}
-                totalSections={course.sections.length}
-                onStartQuiz={() => setActiveTab('final-quiz')}
-                onOpenPomodoro={() => setIsPomodoroOpen(true)}
-                onOpenNotes={() => {
-                  setActiveTab('lesson');
-                }}
-                onBrowseLibrary={() => setShowNewDocConfirm(true)}
-                currentLessonTitle={currentSection?.title}
-              />
+            {/* Main Content Area: Pristine, focused reading layout without clutter */}
+            <div className="flex-1 min-h-0 w-full h-full overflow-y-auto bg-transparent flex flex-col p-3 sm:p-5 lg:p-7 pb-24 md:pb-8">
+              {/* Optional Non-blocking Readiness Prompt */}
+              {activeNav === 'learn' && !readinessBannerDismissed && (
+                <div className="max-w-3xl xl:max-w-4xl mx-auto w-full mb-3 p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-emerald-200/80 dark:border-emerald-800/80 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-[#006A4E] dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <Headphones className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">
+                        Ready to focus?
+                      </span>
+                      <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                        Continue your lesson or take 30 seconds to set up your study space.
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setIsStudyPrepOpen(true)}
+                      className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
+                    >
+                      Set up study space
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReadinessBannerDismissed(true);
+                        try {
+                          localStorage.setItem('studymate_readiness_dismissed', 'true');
+                        } catch {}
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-[#1A6EF0] hover:bg-[#1558C4] text-white text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      Start lesson
+                    </button>
+                  </div>
+                </div>
+              )}
 
-              {activeTab === 'lesson' && currentSection && (
+              {/* 1. LEARN HUB: FOCUSED STUDY NOW VIEW */}
+              {activeNav === 'learn' && currentSection && (
                 <LessonView
                   section={currentSection}
                   totalSections={course.sections.length}
@@ -743,33 +779,47 @@ export function AppContent() {
                 />
               )}
 
-              {activeTab === 'flashcards' && <FlashcardsView course={course} />}
-
-              {activeTab === 'mistakes' && (
-                <ReviewMistakesView
+              {/* 2. PRACTICE HUB: FLASHCARDS, FINAL QUIZ, MISTAKES, EXAM PREP */}
+              {activeNav === 'practice' && (
+                <PracticeHub
+                  course={course}
                   mistakes={mistakes}
                   onCorrectMistake={handleCorrectMistake}
                   onRecordMistakeAgain={handleRecordMistakeAgain}
-                  onJumpToSection={(idx) => {
-                    setCurrentSectionIndex(idx);
-                    setActiveTab('lesson');
-                  }}
-                />
-              )}
-
-              {activeTab === 'final-quiz' && <FinalQuizView course={course} />}
-
-              {activeTab === 'exam-prep' && (
-                <ExamPrepView
-                  course={course}
                   onJumpToLesson={(idx) => {
                     setCurrentSectionIndex(idx);
-                    setActiveTab('lesson');
+                    setActiveNav('learn');
                   }}
                 />
               )}
 
-              {activeTab === 'audit' && <ContentAuditLedger course={course} />}
+              {/* 3. PLAN HUB: HABIT TRACKER, POMODORO TIMER, STUDY READINESS */}
+              {activeNav === 'plan' && (
+                <PlannerView
+                  course={course}
+                  completedSectionCount={completedSectionIndices.length}
+                  onStartQuiz={() => setActiveNav('practice')}
+                  onOpenNotes={() => setActiveNav('library')}
+                  onBrowseLibrary={() => setShowNewDocConfirm(true)}
+                  onOpenStudyPrep={() => setIsStudyPrepOpen(true)}
+                />
+              )}
+
+              {/* 4. LIBRARY HUB: DOCUMENT OVERVIEW, EXTRACTED NOTES, MULTI-UPLOAD */}
+              {activeNav === 'library' && (
+                <LibraryView
+                  course={course}
+                  onNewDocumentClick={() => setShowNewDocConfirm(true)}
+                  onSelectSection={(idx) => {
+                    setCurrentSectionIndex(idx);
+                    setActiveNav('learn');
+                  }}
+                  onOpenAudit={() => setActiveNav('audit')}
+                />
+              )}
+
+              {/* 5. AUDIT VIEW: CONTENT INTEGRITY & PROOF */}
+              {activeNav === 'audit' && <ContentAuditLedger course={course} />}
             </div>
           </div>
         )}
@@ -816,7 +866,7 @@ export function AppContent() {
         onUpdateStudyConfig={handleUpdateStudyConfig}
         onNavigateToSection={(idx) => {
           setCurrentSectionIndex(idx);
-          setActiveTab('lesson');
+          setActiveNav('learn');
         }}
         onOpenFullSettings={() => setIsSettingsOpen(true)}
       />
@@ -862,7 +912,7 @@ export function AppContent() {
         isOpen={isStudyPrepOpen}
         onClose={() => setIsStudyPrepOpen(false)}
         onStartStudy={() => {
-          setActiveTab('lesson');
+          setActiveNav('learn');
           setIsStudyPrepOpen(false);
         }}
         documentTitle={course?.documentTitle}

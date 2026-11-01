@@ -24,6 +24,8 @@ import {
   BookOpen,
   WitchHat,
   VampireFangs,
+  ChevronDown,
+  ChevronUp,
 } from './icons.tsx';
 import { MemoThreeCanvas, MemoMood, MemoColorPreset } from './MemoThreeCanvas';
 import { useThemeAndText } from '../context/ThemeAndTextContext.tsx';
@@ -59,6 +61,8 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
   const [activeTab, setActiveTab] = useState<'doubts' | 'config' | 'playground'>('doubts');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showMoreSuggestions, setShowMoreSuggestions] = useState(false);
+  const [showAdvancedConfig, setShowAdvancedConfig] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [memoMood, setMemoMood] = useState<MemoMood>('idle');
@@ -237,7 +241,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
     <>
       {/* FLOATING DOCKED COMPANION BUTTON (WHEN CLOSED) */}
       {!isOpen && (
-        <div className="fixed bottom-5 right-5 z-40 flex items-center group">
+        <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center group">
           {/* Tooltip pill - appears smoothly on hover, zero interference when not hovered */}
           <button
             type="button"
@@ -279,30 +283,35 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
         </div>
       )}
 
-      {/* EXPANDED CHAT / CONFIGURATION MODAL / DRAWER */}
+      {/* DIMMED BACKDROP TO FOCUS LEARNER */}
       {isOpen && (
         <div
-          className={`fixed z-50 transition-all duration-300 ease-out flex flex-col bg-white dark:bg-[#1e2330] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden ${
-            isExpanded
-              ? 'inset-3 sm:inset-6 md:inset-10'
-              : 'bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 w-[calc(100vw-24px)] sm:w-[440px] md:w-[460px] max-w-[460px] h-[640px] max-h-[90vh]'
-          }`}
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity animate-fadeIn cursor-pointer"
+          onClick={toggleOpen}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* FOCUSED SIDE PANEL (DESKTOP) / FULL-HEIGHT BOTTOM SHEET (MOBILE) */}
+      {isOpen && (
+        <aside
+          role="dialog"
+          aria-label="Memo Study Assistant"
+          className="fixed z-50 flex flex-col bg-white dark:bg-[#181C24] shadow-2xl border-zinc-200/90 dark:border-zinc-800 transition-all duration-300 ease-out
+            inset-x-0 bottom-0 h-[92vh] max-h-[92vh] rounded-t-3xl border-t
+            sm:inset-x-auto sm:right-0 sm:top-0 sm:bottom-0 sm:h-full sm:max-h-full sm:w-[450px] md:w-[480px] sm:rounded-none sm:border-t-0 sm:border-l overflow-hidden"
         >
           {/* TOP BAR / CHARACTER HEADER */}
-          <div className="relative px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 via-white to-[#F0FDF4] dark:from-[#181d28] dark:via-[#1e2330] dark:to-[#16251f] flex items-center justify-between gap-2 shrink-0">
+          <div className="relative px-4 sm:px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-900/90 flex items-center justify-between gap-3 shrink-0">
             {/* Memo Avatar & Title */}
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <div
                 onClick={() => {
                   setMemoMood('happy');
                   playCalmChime(studyConfig.audioFeedback);
                   setTimeout(() => setMemoMood('idle'), 2500);
                 }}
-                className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border overflow-hidden cursor-pointer transition-all flex items-center justify-center relative shrink-0 ${
-                  memoHalloweenTheme
-                    ? 'border-orange-400 dark:border-orange-500 hover:ring-2 hover:ring-orange-400/40'
-                    : 'border-slate-200 dark:border-slate-700/60 hover:ring-2 hover:ring-[#22D08B]/40'
-                }`}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden cursor-pointer flex items-center justify-center relative shrink-0 shadow-2xs hover:scale-105 transition-transform"
                 title="Tap Memo to emote!"
               >
                 <div className="w-12 h-12">
@@ -319,56 +328,45 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-semibold text-sm sm:text-base text-[#3A3F4F] dark:text-slate-100 leading-tight">
+                  <h3 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 leading-tight">
                     Memo
                   </h3>
-                  <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-[#006A4E] dark:bg-emerald-400 animate-pulse shrink-0" />
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    Companion
+                  </span>
                 </div>
-                <p className="text-xs text-[#5F6573] dark:text-slate-400 truncate">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
                   {currentSection
                     ? currentSection.title
-                    : 'Ready to clear doubts & help you configure'}
+                    : 'Calm reflection & doubt clearing'}
                 </p>
               </div>
             </div>
 
-            {/* Action buttons on the right - cleanly aligned, cannot overflow */}
-            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            {/* Action buttons on the right - cleanly aligned, accessible touch targets */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() =>
                   onUpdateStudyConfig({ audioFeedback: !studyConfig.audioFeedback })
                 }
-                className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
                 title={studyConfig.audioFeedback ? 'Mute chimes' : 'Enable chimes'}
                 aria-label="Toggle chimes"
               >
                 {studyConfig.audioFeedback ? (
-                  <Volume2 className="w-4 h-4 text-[#22D08B]" />
+                  <Volume2 className="w-4 h-4 text-[#006A4E] dark:text-emerald-400" />
                 ) : (
                   <VolumeX className="w-4 h-4" />
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="w-8 h-8 items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden sm:flex cursor-pointer shrink-0"
-                title={isExpanded ? 'Restore window size' : 'Expand window'}
-                aria-label="Expand or restore window"
-              >
-                {isExpanded ? (
-                  <Minimize2 className="w-4 h-4" />
-                ) : (
-                  <Maximize2 className="w-4 h-4" />
-                )}
-              </button>
-
-              {/* Close button - high contrast, prominent, never pushed off screen */}
+              {/* Close button - prominent, responsive, minimum 44px touch target on mobile */}
               <button
                 type="button"
                 onClick={toggleOpen}
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 hover:text-rose-600 hover:bg-rose-50 dark:text-slate-200 dark:hover:bg-rose-950/60 dark:hover:text-rose-400 border border-slate-300 dark:border-slate-700 transition-all cursor-pointer shrink-0 shadow-2xs"
+                className="w-10 h-10 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-zinc-200/80 dark:bg-zinc-800 text-zinc-800 hover:text-rose-600 hover:bg-rose-50 dark:text-zinc-100 dark:hover:bg-rose-950 dark:hover:text-rose-300 border border-zinc-300 dark:border-zinc-700 transition-all cursor-pointer shrink-0 shadow-2xs"
                 title="Close Memo"
                 aria-label="Close Memo"
               >
@@ -518,18 +516,35 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Quick contextual chips */}
-              <div className="px-5 pt-2 pb-1 flex items-center gap-2 overflow-x-auto scrollbar-none border-t border-slate-100 dark:border-slate-800/80 bg-white/70 dark:bg-[#1b202c]/70">
-                <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                {getContextualPrompts().map((p, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSendMessage(p)}
-                    className="whitespace-nowrap text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#5F6573] dark:text-slate-300 transition-colors"
-                  >
-                    {p}
-                  </button>
-                ))}
+              {/* Quick contextual chips (max 3 first, rest behind More suggestions) */}
+              <div className="px-4 py-2 border-t border-zinc-100 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/70 space-y-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 mr-1 shrink-0">
+                    <Lightbulb className="w-3.5 h-3.5 shrink-0" />
+                    <span>Suggestions:</span>
+                  </div>
+                  {getContextualPrompts()
+                    .slice(0, showMoreSuggestions ? undefined : 3)
+                    .map((p, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleSendMessage(p)}
+                        className="text-xs px-2.5 py-1 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition-colors text-left cursor-pointer border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs"
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  {getContextualPrompts().length > 3 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreSuggestions(!showMoreSuggestions)}
+                      className="text-xs px-2 py-1 rounded-xl text-[#006A4E] dark:text-emerald-400 font-medium hover:underline cursor-pointer"
+                    >
+                      {showMoreSuggestions ? 'Fewer' : '+ More suggestions'}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Chat Input form */}
@@ -564,182 +579,201 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
           {/* TAB CONTENT 2: STUDY CONFIGURATIONS */}
           {activeTab === 'config' && (
-            <div className="flex-1 overflow-y-auto p-6 bg-[#F9FAFC] dark:bg-[#171b24] space-y-6">
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-[#F9FAFC] dark:bg-[#161A22] space-y-4">
               <div>
-                <h4 className="font-semibold text-sm text-[#3A3F4F] dark:text-slate-200 mb-1">
+                <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
                   Calm Learning Configurations
                 </h4>
-                <p className="text-xs text-[#5F6573] dark:text-slate-400">
-                  Configure how you digest lessons to minimize overload and fatigue.
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                  Tune cognitive load and pacing to keep reading effortless.
                 </p>
               </div>
 
-              {/* 1. Text Size */}
-              <div className="bg-white dark:bg-[#202534] p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Lesson Text Size
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['standard', 'large', 'xlarge'] as const).map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => onUpdateStudyConfig({ fontSize: size })}
-                      className={`py-2 px-3 rounded-xl text-xs font-medium border text-center transition-all ${
-                        studyConfig.fontSize === size
-                          ? 'border-[#1A6EF0] bg-blue-50/70 dark:bg-blue-900/30 text-[#1A6EF0] dark:text-blue-300 font-semibold'
-                          : 'border-slate-200 dark:border-slate-700 text-[#5F6573] dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      {size === 'standard' && 'Standard (16px)'}
-                      {size === 'large' && 'Large (18px)'}
-                      {size === 'xlarge' && 'Extra Large (20px)'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2. Theme Mood */}
-              <div className="bg-white dark:bg-[#202534] p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Visual Theme & Contrast
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'daylight', label: 'Daylight', desc: 'Cool soft gray' },
-                    { id: 'slate', label: 'Slate Dark', desc: 'Cozy dark slate' },
-                    { id: 'twilight', label: 'Twilight', desc: 'Gentle night' },
-                  ].map((thm) => (
-                    <button
-                      key={thm.id}
-                      onClick={() => onUpdateStudyConfig({ theme: thm.id as any })}
-                      className={`py-2 px-3 rounded-xl text-xs font-medium border text-center transition-all ${
-                        studyConfig.theme === thm.id
-                          ? 'border-[#1A6EF0] bg-blue-50/70 dark:bg-blue-900/30 text-[#1A6EF0] dark:text-blue-300 font-semibold'
-                          : 'border-slate-200 dark:border-slate-700 text-[#5F6573] dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <div>{thm.label}</div>
-                      <div className="text-[10px] text-slate-400">{thm.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 3. Study Pace */}
-              <div className="bg-white dark:bg-[#202534] p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Study Pace
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'calm', label: 'Calm', desc: '1 chunk at a time' },
-                    { id: 'balanced', label: 'Balanced', desc: 'Standard reveal' },
-                    { id: 'fast', label: 'Full Read', desc: 'All chunks open' },
-                  ].map((pace) => (
-                    <button
-                      key={pace.id}
-                      onClick={() => onUpdateStudyConfig({ studyPace: pace.id as any })}
-                      className={`py-2 px-3 rounded-xl text-xs font-medium border text-center transition-all ${
-                        studyConfig.studyPace === pace.id
-                          ? 'border-[#1A6EF0] bg-blue-50/70 dark:bg-blue-900/30 text-[#1A6EF0] dark:text-blue-300 font-semibold'
-                          : 'border-slate-200 dark:border-slate-700 text-[#5F6573] dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <div>{pace.label}</div>
-                      <div className="text-[10px] text-slate-400">{pace.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Simpler Wording Default (Plain Words Mode) */}
-              <div className="bg-white dark:bg-[#202534] p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Default Simpler Wording
+              {/* RECOMMENDED CALM SETTINGS FIRST */}
+              <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#006A4E] dark:text-emerald-400 shrink-0" />
+                    <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                      Recommended Calm Defaults
+                    </span>
                   </div>
-                  <div className="text-[11px] text-[#5F6573] dark:text-slate-400">
-                    Always show plain words first for lower stress
-                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200">
+                    Low Stress
+                  </span>
                 </div>
-                <button
-                  onClick={() =>
-                    onUpdateStudyConfig({
-                      plainWordsDefault: !studyConfig.plainWordsDefault,
-                    })
-                  }
-                  className={`w-11 h-6 rounded-full transition-colors relative ${
-                    studyConfig.plainWordsDefault ? 'bg-[#1A6EF0]' : 'bg-slate-300 dark:bg-slate-700'
-                  }`}
-                >
-                  <span
-                    className={`block w-4 h-4 bg-white rounded-full transition-transform transform ${
-                      studyConfig.plainWordsDefault ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
 
-              {/* 5. Sound Chimes */}
-              <div className="bg-white dark:bg-[#202534] p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Procedural Audio Chimes
-                  </div>
-                  <div className="text-[11px] text-[#5F6573] dark:text-slate-400">
-                    Calm, soothing sound feedback on correct answers and progress
-                  </div>
-                </div>
-                <button
-                  onClick={() =>
-                    onUpdateStudyConfig({
-                      audioFeedback: !studyConfig.audioFeedback,
-                    })
-                  }
-                  className={`w-11 h-6 rounded-full transition-colors relative ${
-                    studyConfig.audioFeedback ? 'bg-[#22D08B]' : 'bg-slate-300 dark:bg-slate-700'
-                  }`}
-                >
-                  <span
-                    className={`block w-4 h-4 bg-white rounded-full transition-transform transform ${
-                      studyConfig.audioFeedback ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
+                <p className="text-xs text-emerald-950/80 dark:text-emerald-200/90 leading-relaxed">
+                  Single-chunk progressive pacing, plain words mode enabled, Meadow Sage theme, and gentle audio chimes.
+                </p>
 
-              {/* Reset to calm default */}
-              <button
-                onClick={() => {
-                  onUpdateStudyConfig({
-                    fontSize: 'standard',
-                    theme: 'daylight',
-                    plainWordsDefault: false,
-                    studyPace: 'calm',
-                    audioFeedback: true,
-                    questionTypeFilter: 'all',
-                    autoAdvanceChunks: false,
-                  });
-                  playCalmChime(true);
-                }}
-                className="w-full py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-400 hover:border-[#1A6EF0] hover:text-[#1A6EF0] transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset to Recommended Calm Settings</span>
-              </button>
-
-              {onOpenFullSettings && (
                 <button
                   type="button"
                   onClick={() => {
-                    onOpenFullSettings();
+                    onUpdateStudyConfig({
+                      fontSize: 'standard',
+                      theme: 'daylight',
+                      plainWordsDefault: true,
+                      studyPace: 'calm',
+                      audioFeedback: true,
+                      questionTypeFilter: 'all',
+                      autoAdvanceChunks: false,
+                    });
+                    playCalmChime(true);
                   }}
-                  className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                  className="w-full py-2.5 rounded-xl bg-[#1A6EF0] hover:bg-[#1558C4] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                 >
-                  <Sliders className="w-3.5 h-3.5 text-[#1A6EF0]" />
-                  <span>Open Full Settings & About Creator</span>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Apply Recommended Calm Settings</span>
                 </button>
-              )}
+              </div>
+
+              {/* CUSTOMIZE SETTINGS TOGGLE */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedConfig(!showAdvancedConfig)}
+                  className="w-full p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/60 flex items-center justify-between text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-[#006A4E] dark:text-emerald-400" />
+                    <span>Customize Individual Settings</span>
+                  </div>
+                  {showAdvancedConfig ? (
+                    <ChevronUp className="w-4 h-4 text-zinc-400" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-zinc-400" />
+                  )}
+                </button>
+
+                {showAdvancedConfig && (
+                  <div className="mt-3 space-y-3 animate-fadeIn">
+                    {/* 1. Text Size */}
+                    <div className="bg-white dark:bg-zinc-850 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
+                        Reading Text Size
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['standard', 'large', 'xlarge'] as const).map((size) => (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => onUpdateStudyConfig({ fontSize: size })}
+                            className={`py-2 px-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
+                              studyConfig.fontSize === size
+                                ? 'border-[#006A4E] bg-emerald-50 dark:bg-emerald-950/40 text-[#006A4E] dark:text-emerald-300 font-semibold shadow-2xs'
+                                : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                            }`}
+                          >
+                            {size === 'standard' && 'Standard'}
+                            {size === 'large' && 'Large'}
+                            {size === 'xlarge' && 'Extra Large'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 2. Study Pace */}
+                    <div className="bg-white dark:bg-zinc-850 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
+                        Study Pace
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: 'calm', label: 'Calm', desc: '1 chunk at a time' },
+                          { id: 'balanced', label: 'Balanced', desc: 'Step-by-step' },
+                          { id: 'fast', label: 'Full Read', desc: 'All visible' },
+                        ].map((pace) => (
+                          <button
+                            key={pace.id}
+                            type="button"
+                            onClick={() => onUpdateStudyConfig({ studyPace: pace.id as any })}
+                            className={`py-2 px-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
+                              studyConfig.studyPace === pace.id
+                                ? 'border-[#006A4E] bg-emerald-50 dark:bg-emerald-950/40 text-[#006A4E] dark:text-emerald-300 font-semibold shadow-2xs'
+                                : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                            }`}
+                          >
+                            <div className="font-semibold">{pace.label}</div>
+                            <div className="text-[10px] opacity-75">{pace.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 3. Simpler Wording Toggle */}
+                    <div className="bg-white dark:bg-zinc-850 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
+                      <div>
+                        <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                          Simpler Wording Default
+                        </div>
+                        <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Prioritizes accessible language for lower fatigue
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateStudyConfig({
+                            plainWordsDefault: !studyConfig.plainWordsDefault,
+                          })
+                        }
+                        className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                          studyConfig.plainWordsDefault ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
+                        }`}
+                        aria-label="Toggle simpler wording default"
+                      >
+                        <span
+                          className={`block w-4 h-4 bg-white rounded-full transition-transform transform ${
+                            studyConfig.plainWordsDefault ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* 4. Procedural Audio Chimes */}
+                    <div className="bg-white dark:bg-zinc-850 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
+                      <div>
+                        <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                          Procedural Audio Chimes
+                        </div>
+                        <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Calm sound feedback on milestones & correct answers
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateStudyConfig({
+                            audioFeedback: !studyConfig.audioFeedback,
+                          })
+                        }
+                        className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                          studyConfig.audioFeedback ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
+                        }`}
+                        aria-label="Toggle audio chimes"
+                      >
+                        <span
+                          className={`block w-4 h-4 bg-white rounded-full transition-transform transform ${
+                            studyConfig.audioFeedback ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {onOpenFullSettings && (
+                      <button
+                        type="button"
+                        onClick={onOpenFullSettings}
+                        className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                      >
+                        <Sliders className="w-3.5 h-3.5 text-[#006A4E] dark:text-emerald-400" />
+                        <span>Open Full Settings & About Creator</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -911,7 +945,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
               </div>
             </div>
           )}
-        </div>
+        </aside>
       )}
     </>
   );

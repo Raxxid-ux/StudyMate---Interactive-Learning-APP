@@ -145,14 +145,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       previewText: 'text-[#2D251E]',
     },
     {
-      id: 'aurora',
-      name: 'Aurora Sky',
-      subtitle: 'Cool crisp daylight with vibrant blue clarity',
-      previewBg: 'bg-[#EDF2F8]',
-      previewAccent: 'bg-[#1A6EF0]',
-      previewText: 'text-[#1E293B]',
-    },
-    {
       id: 'cosmic',
       name: 'Cosmic Night',
       subtitle: 'Deep starlight slate for relaxed evening study',
@@ -160,14 +152,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       previewBg: 'bg-[#10141D]',
       previewAccent: 'bg-[#60A5FA]',
       previewText: 'text-[#F1F5F9]',
-    },
-    {
-      id: 'sepia',
-      name: 'Sepia Warmth',
-      subtitle: 'Warm bookish parchment, gentle on fatigued eyes',
-      previewBg: 'bg-[#FAF6EE]',
-      previewAccent: 'bg-[#D97706]',
-      previewText: 'text-[#452B14]',
     },
     {
       id: 'high-contrast',
@@ -604,7 +588,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     playSoftTap(studyConfig.audioFeedback);
                   }}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
-                    dyslexicFont ? 'bg-emerald-600' : 'bg-zinc-300 dark:bg-zinc-700'
+                    dyslexicFont ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
                   }`}
                   aria-label="Toggle dyslexia-optimized font"
                 >

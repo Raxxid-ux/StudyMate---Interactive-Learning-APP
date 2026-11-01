@@ -612,3 +612,19 @@ export const Layout: React.FC<IconProps> = ({ className, size, ...rest }) => (
     <path d="M9 21V9" />
   </svg>
 );
+
+export const MoreHorizontal: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const FolderOpen: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <path d="M4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20Z" />
+    <path d="M2 10H22" />
+  </svg>
+);
+

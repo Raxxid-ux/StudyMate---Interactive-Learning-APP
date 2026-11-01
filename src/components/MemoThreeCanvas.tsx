@@ -89,7 +89,8 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
     const width = container.clientWidth || 300;
     const height = container.clientHeight || 300;
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0.4, 5.2);
+    camera.position.set(0, -0.15, 5.8);
+    camera.lookAt(0, -0.15, 0);
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
@@ -106,6 +107,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       if (container && container.clientWidth > 0 && container.clientHeight > 0) {
         camera.aspect = container.clientWidth / container.clientHeight;
         camera.updateProjectionMatrix();
+        camera.lookAt(0, -0.15, 0);
         renderer.setSize(container.clientWidth, container.clientHeight);
       }
     });
@@ -825,6 +827,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
         const ch = container.clientHeight;
         camera.aspect = cw / ch;
         camera.updateProjectionMatrix();
+        camera.lookAt(0, -0.15, 0);
         renderer.setSize(cw, ch);
       }
 
@@ -841,6 +844,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
       if (newW > 0 && newH > 0) {
         camera.aspect = newW / newH;
         camera.updateProjectionMatrix();
+        camera.lookAt(0, -0.15, 0);
         renderer.setSize(newW, newH);
       }
     });
@@ -917,7 +921,7 @@ export const MemoThreeCanvas: React.FC<MemoThreeCanvasProps> = ({
   const getDimensions = () => {
     switch (size) {
       case 'compact':
-        return 'w-24 h-24';
+        return 'w-28 h-32';
       case 'medium':
         return 'w-48 h-48';
       case 'large':

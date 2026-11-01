@@ -401,7 +401,7 @@ export const ExamPrepView: React.FC<ExamPrepViewProps> = ({ course, onJumpToLess
                         setClozeIndex((prev) => (prev + 1) % allGlossary.length);
                         playCalmChime(true);
                       }}
-                      className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-1.5"
+                      className="px-5 py-2.5 rounded-xl bg-[#1A6EF0] hover:bg-[#1558C4] text-white text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-1.5"
                     >
                       <Check className="w-3.5 h-3.5" />
                       <span>I Knew It · Next</span>
