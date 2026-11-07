@@ -326,12 +326,12 @@ export const LessonView: React.FC<LessonViewProps> = ({
           </div>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-light text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-light text-zinc-900 dark:text-zinc-100 tracking-tight">
           {section.title}
         </h1>
 
         {lesson?.intro && (
-          <p className="text-[#5F6573] dark:text-[#A6ACB9] text-sm sm:text-base leading-relaxed">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
             {lesson.intro}
           </p>
         )}
@@ -365,7 +365,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
             return (
               <div
                 key={chunk.id || cIdx}
-                className={`p-6 sm:p-7 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-2 animate-fadeIn transition-all duration-300 ${
+                className={`p-6 sm:p-7 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-2 animate-fadeIn transition-all duration-300 ${
                   isDimmed ? 'single-chunk-dimmed' : ''
                 }`}
               >
@@ -373,11 +373,11 @@ export const LessonView: React.FC<LessonViewProps> = ({
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A6EF0]">
                     {chunk.title}
                   </span>
-                  <span className="text-[10px] text-[#5F6573] dark:text-[#A6ACB9]">
+                  <span className="text-[10px] text-zinc-600 dark:text-zinc-400">
                     Part {cIdx + 1} of {chunks.length}
                   </span>
                 </div>
-                <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] leading-relaxed ${fontSizeClass}`}>
+                <p className={`text-zinc-900 dark:text-zinc-100 leading-relaxed ${fontSizeClass}`}>
                   {renderFormattedText(chunk.content)}
                 </p>
               </div>
@@ -406,11 +406,11 @@ export const LessonView: React.FC<LessonViewProps> = ({
           {steps.map((st, sIdx) => (
             <div
               key={sIdx}
-              className="p-6 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-4"
+              className="p-6 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-4"
             >
               <div className="flex items-center gap-2">
                 <GitCommit className="w-4 h-4 text-[#1A6EF0]" />
-                <h3 className="font-semibold text-sm sm:text-base text-[#3A3F4F] dark:text-[#F1F3F7]">
+                <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
                   {st.title}
                 </h3>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -425,10 +425,10 @@ export const LessonView: React.FC<LessonViewProps> = ({
                       key={iIdx}
                       className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800"
                     >
-                      <span className="text-xs font-bold uppercase text-[#5F6573] dark:text-[#A6ACB9] block mb-1">
+                      <span className="text-xs font-bold uppercase text-zinc-600 dark:text-zinc-400 block mb-1">
                         {item.label}
                       </span>
-                      <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] ${fontSizeClass}`}>
+                      <p className={`text-zinc-900 dark:text-zinc-100 ${fontSizeClass}`}>
                         {item.detail}
                       </p>
                     </div>
@@ -440,10 +440,10 @@ export const LessonView: React.FC<LessonViewProps> = ({
                     <li key={iIdx} className="relative">
                       <div className="absolute -left-[23px] top-1.5 w-3 h-3 rounded-full bg-[#1A6EF0]" />
                       <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-                        <span className="font-bold text-xs uppercase text-[#5F6573] dark:text-[#A6ACB9] block mb-0.5">
+                        <span className="font-bold text-xs uppercase text-zinc-600 dark:text-zinc-400 block mb-0.5">
                           {item.label}
                         </span>
-                        <span className={`text-[#3A3F4F] dark:text-[#F1F3F7] ${fontSizeClass}`}>
+                        <span className={`text-zinc-900 dark:text-zinc-100 ${fontSizeClass}`}>
                           {item.detail}
                         </span>
                       </div>
@@ -459,13 +459,13 @@ export const LessonView: React.FC<LessonViewProps> = ({
       {/* Key Points Box: 3 to 4 points at the end of each section */}
       {allChunksRevealed && keyPoints.length > 0 && (
         <section
-          className="p-6 sm:p-7 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-4 animate-fadeIn"
+          className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-4 animate-fadeIn"
           aria-label="Section key points"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-[#22D08B]" />
-              <h3 className="text-base sm:text-lg font-medium text-[#3A3F4F] dark:text-[#F1F3F7]">
+              <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-zinc-100">
                 Key Points
               </h3>
             </div>
@@ -478,7 +478,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
             {keyPoints.map((point, kIdx) => (
               <li key={kIdx} className="flex items-start gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#1A6EF0] mt-2.5 shrink-0" />
-                <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] leading-relaxed ${fontSizeClass}`}>
+                <p className={`text-zinc-900 dark:text-zinc-100 leading-relaxed ${fontSizeClass}`}>
                   {point}
                 </p>
               </li>
@@ -495,11 +495,11 @@ export const LessonView: React.FC<LessonViewProps> = ({
         >
           <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 pb-4">
             <div>
-              <h3 className="text-xl font-medium text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center gap-2">
+              <h3 className="text-xl font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-[#1A6EF0]" />
                 <span>Check yourself</span>
               </h3>
-              <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] mt-0.5">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
                 Instant feedback. Learning is the priority: answers and quotes are grounded directly in the text.
               </p>
             </div>
@@ -521,7 +521,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
                   className="space-y-4 pt-2 border-b border-zinc-100 dark:border-zinc-800/80 last:border-b-0 pb-6 last:pb-0"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                       Question {qIdx + 1} ({q.type.replace('-', ' ')})
                     </span>
                     {isAnswered && (
@@ -545,7 +545,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
                     )}
                   </div>
 
-                  <p className={`font-medium text-[#3A3F4F] dark:text-[#F1F3F7] ${fontSizeClass}`}>
+                  <p className={`font-medium text-zinc-900 dark:text-zinc-100 ${fontSizeClass}`}>
                     {q.question}
                   </p>
 
@@ -556,7 +556,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
                       const isTargetCorrect = opt === q.correctAnswer;
 
                       let btnStyle =
-                        'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 bg-[#F9FAFC] dark:bg-zinc-800/40 text-[#3A3F4F] dark:text-[#F1F3F7]';
+                        'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 bg-white dark:bg-zinc-800/40 text-zinc-900 dark:text-zinc-100';
 
                       if (isAnswered) {
                         if (isSelected && isCorrect) {
@@ -601,15 +601,15 @@ export const LessonView: React.FC<LessonViewProps> = ({
                     </button>
 
                     {showQuote && (
-                      <div className="mt-2.5 p-4 rounded-2xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-1.5 animate-fadeIn">
-                        <div className="text-xs font-semibold text-[#5F6573] dark:text-[#A6ACB9]">
+                      <div className="mt-2.5 p-4 rounded-2xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-1.5 animate-fadeIn">
+                        <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                           Exact quote from "{section.title}":
                         </div>
-                        <blockquote className="text-xs sm:text-sm text-[#3A3F4F] dark:text-[#F1F3F7] italic border-l-2 border-[#1A6EF0] pl-3 py-0.5">
+                        <blockquote className="text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 italic border-l-2 border-[#1A6EF0] pl-3 py-0.5">
                           "{q.sourceQuote}"
                         </blockquote>
-                        <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] pt-0.5">
-                          Answer: <strong className="text-[#3A3F4F] dark:text-[#F1F3F7]">{q.correctAnswer}</strong>
+                        <div className="text-[11px] text-zinc-600 dark:text-zinc-400 pt-0.5">
+                          Answer: <strong className="text-zinc-900 dark:text-zinc-100">{q.correctAnswer}</strong>
                         </div>
                       </div>
                     )}
@@ -625,7 +625,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
       <section className="pt-2">
         <button
           onClick={() => setShowOriginalText(!showOriginalText)}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-[#5F6573] dark:text-[#A6ACB9] hover:text-[#1A6EF0] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-[#1A6EF0] transition-colors cursor-pointer"
         >
           <FileText className="w-4 h-4" />
           <span>{showOriginalText ? 'Hide original text' : 'Show original text'}</span>
@@ -637,7 +637,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
             <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">
               Cleaned Original Document Text
             </span>
-            <div className={`text-[#3A3F4F] dark:text-[#F1F3F7] leading-relaxed whitespace-pre-line ${fontSizeClass}`}>
+            <div className={`text-zinc-900 dark:text-zinc-100 leading-relaxed whitespace-pre-line ${fontSizeClass}`}>
               {section.content}
             </div>
           </div>
@@ -651,7 +651,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
           type="button"
           onClick={onPreviousSection}
           disabled={!hasPrevious}
-          className="h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] text-xs sm:text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer whitespace-nowrap shadow-2xs"
+          className="h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer whitespace-nowrap shadow-2xs"
         >
           <ArrowLeft className="w-4 h-4 shrink-0" />
           <span className="leading-none">Previous Lesson</span>
@@ -665,7 +665,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
             className={`h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
               isCompleted
                 ? 'bg-[#A8C7FA] text-[#0A387E] hover:bg-[#96befa]'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700'
             }`}
           >
             <CheckCircle2 className="w-4 h-4 shrink-0" />

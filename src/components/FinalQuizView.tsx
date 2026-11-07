@@ -427,7 +427,7 @@ export const FinalQuizView: React.FC<FinalQuizViewProps> = ({ course }) => {
 
         {/* Compact Question Jump Navigator */}
         {showNavigator && (
-          <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto py-1 tabs-container no-scrollbar">
             {allQuestions.map((q, idx) => {
               const hasAns = Boolean(userAnswers[q.id]);
               const isCurrent = idx === currentIndex;

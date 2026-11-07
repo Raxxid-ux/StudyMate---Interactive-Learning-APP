@@ -17,7 +17,6 @@ import {
   Sliders,
   Volume2,
   VolumeX,
-  Heart,
   Quote,
   Copy,
   Check,
@@ -29,14 +28,14 @@ import {
   Instagram,
   Linkedin,
   ExternalLink,
-  Lock,
-  ShieldCheck,
   MessageCircle,
   Activity,
   Eye,
   Zap,
   WitchHat,
   CheckCircle2,
+  Info,
+  HelpCircle,
 } from './icons.tsx';
 import { useThemeAndText, AppTheme, SupportStyle } from '../context/ThemeAndTextContext.tsx';
 import type { StudyConfiguration } from '../types.ts';
@@ -85,6 +84,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const [activeTab, setActiveTab] = useState<'appearance' | 'neurodiversity' | 'study' | 'creator'>('appearance');
   const [copiedNote, setCopiedNote] = useState(false);
+  const [hasSeenTour, setHasSeenTour] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('studymate_settings_tour_completed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [expandedInfo, setExpandedInfo] = useState<Record<string, boolean>>({});
+
+  const toggleInfo = (id: string) => {
+    setExpandedInfo((prev) => ({ ...prev, [id]: !prev[id] }));
+    playSoftTap(studyConfig.audioFeedback);
+  };
+
+  const handleDismissTour = () => {
+    try {
+      localStorage.setItem('studymate_settings_tour_completed', 'true');
+    } catch {}
+    setHasSeenTour(true);
+    playSoftTap(studyConfig.audioFeedback);
+  };
+
+  const handleReopenTour = () => {
+    try {
+      localStorage.removeItem('studymate_settings_tour_completed');
+    } catch {}
+    setHasSeenTour(false);
+    playSoftTap(studyConfig.audioFeedback);
+  };
 
   if (!isOpen) return null;
 
@@ -121,7 +149,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     id: AppTheme;
     name: string;
     subtitle: string;
-    badge?: string;
     previewBg: string;
     previewAccent: string;
     previewText: string;
@@ -129,8 +156,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     {
       id: 'meadow',
       name: 'Meadow Sage',
-      subtitle: 'Soft airy base, calm sage green, pristine reading',
-      badge: 'Default',
+      subtitle: 'Calm sage green, soft airy contrast',
       previewBg: 'bg-[#F3F7F3]',
       previewAccent: 'bg-[#22C55E]',
       previewText: 'text-[#213327]',
@@ -138,8 +164,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     {
       id: 'academia',
       name: 'Dark Academia',
-      subtitle: 'Warm scholar parchment, deep antique wood, and gold leaf',
-      badge: 'Scholar',
+      subtitle: 'Warm scholar parchment and deep antique tones',
       previewBg: 'bg-[#F7F4EC]',
       previewAccent: 'bg-[#C5A059]',
       previewText: 'text-[#2D251E]',
@@ -147,8 +172,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     {
       id: 'cosmic',
       name: 'Cosmic Night',
-      subtitle: 'Deep starlight slate for relaxed evening study',
-      badge: 'Dark',
+      subtitle: 'Deep starlight slate for relaxed evening reading',
       previewBg: 'bg-[#10141D]',
       previewAccent: 'bg-[#60A5FA]',
       previewText: 'text-[#F1F5F9]',
@@ -157,7 +181,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       id: 'high-contrast',
       name: 'High Contrast',
       subtitle: 'Maximum edge sharpness and bold tactile legibility',
-      badge: 'A11y',
       previewBg: 'bg-black',
       previewAccent: 'bg-[#A3E635]',
       previewText: 'text-white',
@@ -182,10 +205,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <Settings className="w-5 h-5" />
             </div>
             <div>
-              <h2 id="settings-title" className="text-base sm:text-lg font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+              <h2 id="settings-title" className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
                 Settings & Accessibility
               </h2>
-              <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 Themes, ADHD & Dyslexia tools, study pacing, and creator notes
               </p>
             </div>
@@ -200,7 +223,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Navigation Tabs (4 Sections) */}
-        <div className="flex items-center gap-1 px-4 sm:px-6 py-2.5 bg-zinc-100/60 dark:bg-zinc-900/60 border-b border-zinc-200/60 dark:border-zinc-800/60 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 px-4 sm:px-6 py-2.5 bg-zinc-100/60 dark:bg-zinc-900/60 border-b border-zinc-200/60 dark:border-zinc-800/60 overflow-x-auto tabs-container no-scrollbar">
           <button
             onClick={() => {
               setActiveTab('appearance');
@@ -253,17 +276,81 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }}
             className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === 'creator'
-                ? 'bg-white dark:bg-[#1F2430] text-[#E11D48] dark:text-[#FB7185] shadow-xs'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-[#E11D48] dark:hover:text-[#FB7185]'
+                ? 'bg-white dark:bg-[#1F2430] text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <Heart className="w-3.5 h-3.5 fill-current text-[#E11D48]" />
-            <span>About Creator</span>
+            <Info className="w-3.5 h-3.5" />
+            <span>About</span>
           </button>
         </div>
 
         {/* Tab Content Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          {/* First-Visit Touring & Instructions Guide (dismissible and persistent) */}
+          {!hasSeenTour && (
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/90 to-indigo-50/80 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200/80 dark:border-blue-900/40 space-y-3 shadow-xs animate-fadeIn">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-[#1A6EF0] text-white flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      Welcome to StudyMate Settings
+                    </h4>
+                    <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                      Scientific, research-backed controls designed to reduce cognitive load and support diverse learning styles.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDismissTour}
+                  className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 rounded-lg transition-colors cursor-pointer"
+                  title="Dismiss guide"
+                  aria-label="Dismiss first-visit guide"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-xs">
+                <div className="p-2.5 rounded-xl bg-white/80 dark:bg-zinc-900/70 border border-blue-100/80 dark:border-blue-900/30 space-y-0.5">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">Themes & Density</span>
+                  <span className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug block">
+                    Choose high-contrast or calm palettes, and select minimal spacing to avoid visual fatigue.
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/80 dark:bg-zinc-900/70 border border-blue-100/80 dark:border-blue-900/30 space-y-0.5">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">ADHD & Dyslexia</span>
+                  <span className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug block">
+                    Lexend font prevents character crowding; bionic reading anchors fixation; ruler guides line tracking.
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/80 dark:bg-zinc-900/70 border border-blue-100/80 dark:border-blue-900/30 space-y-0.5">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">Study Pacing</span>
+                  <span className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug block">
+                    Configure one-chunk-at-a-time focus, simple wording, audio chimes, and smooth auto-advance.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                  Detailed guides will be tucked away after this tour so your UI stays uncluttered.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleDismissTour}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#1A6EF0] hover:bg-[#1558C4] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                >
+                  Got it, hide guide
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: APPEARANCE & THEMES */}
           {activeTab === 'appearance' && (
             <div className="space-y-6">
@@ -273,9 +360,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     Color Themes
                   </label>
-                  <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
-                    Meadow Sage is Benchmark
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -305,11 +389,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                             {t.name}
                           </span>
-                          {t.badge && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider bg-zinc-200/80 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200">
-                              {t.badge}
-                            </span>
-                          )}
                         </div>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
                           {t.subtitle}
@@ -327,13 +406,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                       UI Layout & Density
                     </h3>
-                    <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
                       Reduces visual clutter to avoid stress and decision fatigue
                     </p>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    Low Stress
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -351,12 +427,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                        Minimal UI
+                        Minimal
                       </span>
                       {uiDensity === 'minimal' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                     </div>
                     <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-snug">
-                      Low distraction. Hides secondary tracker banners for peaceful focus.
+                      Hides secondary banners for quiet reading
                     </p>
                   </button>
 
@@ -379,7 +455,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       {uiDensity === 'compact' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
                     </div>
                     <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-snug">
-                      Condensed padding and tighter spacing for dense reading.
+                      Tighter padding for dense document review
                     </p>
                   </button>
 
@@ -397,12 +473,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                        Classic
+                        Comfortable
                       </span>
                       {uiDensity === 'classic' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
                     </div>
                     <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-snug">
-                      Full view with circular progress gauge and quick action cards.
+                      Spacious view with progress gauges
                     </p>
                   </button>
                 </div>
@@ -415,13 +491,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                       Language / ഭാഷ
                     </h3>
-                    <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
-                      Simple Malayalam for kids & teens, or clear English
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                      Clear English, or simple Malayalam for learners
                     </p>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                    Bilingual
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
@@ -441,7 +514,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                         English
                       </div>
-                      <div className="text-[10px] text-zinc-500">Global Scholar</div>
+                      <div className="text-[10px] text-zinc-500">Standard clear English</div>
                     </div>
                     {language === 'en' && <CheckCircle2 className="w-4 h-4 text-[#1A6EF0]" />}
                   </button>
@@ -470,20 +543,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Memo Halloween Special Theme Toggle */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-orange-500/10 border border-orange-400/40 dark:border-orange-500/30 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="p-3.5 rounded-2xl bg-orange-50/40 dark:bg-orange-950/20 border border-orange-200/80 dark:border-orange-900/40 flex items-center justify-between gap-3 shadow-2xs">
                 <div className="space-y-0.5 pr-2">
                   <div className="flex items-center gap-2">
                     <WitchHat className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                     <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      Memo Halloween Theme
+                      Halloween costume for Memo
                     </span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-orange-500 text-white uppercase tracking-wider">
-                      Special Edition
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('halloween')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
-                    Equips Memo with a 3D velvet witch hat, vampire fangs, and spooky pumpkin-violet ambiance
-                  </div>
+                  {(!hasSeenTour || expandedInfo['halloween']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Equips 3D Memo with a velvet witch hat and subtle pumpkin-violet lighting.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -543,10 +623,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <p
                     className={
                       textSize === 'xlarge'
-                        ? 'text-lg font-medium text-[#3A3F4F] dark:text-[#F1F3F7]'
+                        ? 'text-lg font-medium text-zinc-900 dark:text-zinc-100'
                         : textSize === 'large'
-                        ? 'text-base font-medium text-[#3A3F4F] dark:text-[#F1F3F7]'
-                        : 'text-sm font-medium text-[#3A3F4F] dark:text-[#F1F3F7]'
+                        ? 'text-base font-medium text-zinc-900 dark:text-zinc-100'
+                        : 'text-sm font-medium text-zinc-900 dark:text-zinc-100'
                     }
                   >
                     StudyMate makes understanding your documents calm, bite-sized, and deeply rewarding.
@@ -558,28 +638,37 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* TAB 2: ADHD & DYSLEXIA SUITE */}
           {activeTab === 'neurodiversity' && (
-            <div className="space-y-6">
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 flex items-start gap-3">
-                <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                <div className="text-xs leading-relaxed">
-                  <span className="font-bold">Neurodiversity-Informed Design:</span> Tools built for scattered focus, visual crowding, ADHD attention drift, and dyslexia comprehension.
+            <div className="space-y-4">
+              {!hasSeenTour && (
+                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 flex items-start gap-3">
+                  <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="text-xs leading-relaxed">
+                    <span className="font-bold">Neurodiversity-Informed Design:</span> Tools built for scattered focus, visual crowding, ADHD attention drift, and dyslexia comprehension.
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* 1. Dyslexia Font Toggle */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                      Dyslexia-Optimized Font (Lexend)
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Dyslexia-friendly font (Lexend)
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                      High Aperture
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('lexend')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
-                    Uses wider character spacing and unique bottom-weighted glyph geometry to prevent letter flipping and crowding.
-                  </div>
+                  {(!hasSeenTour || expandedInfo['lexend']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Wider character spacing and bottom-weighted glyphs prevent letter flipping and crowding.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -590,7 +679,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                     dyslexicFont ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
                   }`}
-                  aria-label="Toggle dyslexia-optimized font"
+                  aria-label="Toggle dyslexia-friendly font"
                 >
                   <span
                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
@@ -604,16 +693,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                      Bionic Reading Anchors
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Bionic reading anchors
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300">
-                      Fixation Points
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('bionic')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
-                    Bolds the initial letters of each word to create natural fixation anchors, allowing fast scanning with less eye strain.
-                  </div>
+                  {(!hasSeenTour || expandedInfo['bionic']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Bolds the initial letters of each word to create natural fixation anchors for faster scanning.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -638,16 +734,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                      Reading Ruler Overlay
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Reading ruler cursor guide
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
-                      Line Tracker
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('ruler')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
-                    Projects a soft highlighting guide following your cursor to prevent skipping lines or losing your place on the page.
-                  </div>
+                  {(!hasSeenTour || expandedInfo['ruler']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Projects a soft highlighting guide following your cursor to prevent skipping lines.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -672,16 +775,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                      ADHD Single-Chunk Focus Mode
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Single-chunk focus mode
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300">
-                      Anti-Overwhelm
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('singleChunk')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
-                    Gently dims peripheral content so only the currently active explanation is in full contrast, reducing visual noise.
-                  </div>
+                  {(!hasSeenTour || expandedInfo['singleChunk']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Gently dims peripheral content so only the active explanation is in full contrast.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -800,12 +910,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* Plain Words Default */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
-                  <div className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                    Simpler Words by Default
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Plain language explanations
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('plainWords')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
-                    Automatically simplify dense academic or technical sentences
-                  </div>
+                  {(!hasSeenTour || expandedInfo['plainWords']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Simplifies dense academic sentences into clear, direct language.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -816,7 +938,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                     studyConfig.plainWordsDefault ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
                   }`}
-                  aria-label="Toggle simpler words by default"
+                  aria-label="Toggle plain language explanations"
                 >
                   <span
                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
@@ -830,8 +952,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                      Calm Audio Chimes
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Sound feedback on completion
                     </span>
                     <button
                       type="button"
@@ -840,10 +962,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                       (Test Sound)
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('audio')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
-                    Play soothing web audio tones when completing quizzes and sections
-                  </div>
+                  {(!hasSeenTour || expandedInfo['audio']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Plays gentle audio tones when completing quizzes and lessons.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -855,7 +987,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                     studyConfig.audioFeedback ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
                   }`}
-                  aria-label="Toggle calm audio chimes"
+                  aria-label="Toggle sound feedback"
                 >
                   <span
                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
@@ -868,12 +1000,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* Auto Advance Chunks */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
                 <div className="space-y-0.5 pr-4">
-                  <div className="text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
-                    Auto-Advance on Correct Answer
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      Auto-advance after quiz
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleInfo('autoAdvance')}
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                      title="More details"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
-                    Smoothly reveal the next chunk as soon as your check question is solved
-                  </div>
+                  {(!hasSeenTour || expandedInfo['autoAdvance']) && (
+                    <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed animate-fadeIn">
+                      Smoothly reveals the next chunk as soon as your check question is solved.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -884,7 +1028,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                     studyConfig.autoAdvanceChunks ? 'bg-[#1A6EF0]' : 'bg-zinc-300 dark:bg-zinc-700'
                   }`}
-                  aria-label="Toggle auto advance chunks"
+                  aria-label="Toggle auto-advance"
                 >
                   <span
                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
@@ -911,12 +1055,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     />
                   </div>
                   <div className="space-y-1">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100/80 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-bold tracking-wider uppercase">
-                      <Heart className="w-3 h-3 fill-current text-rose-500" />
-                      <span>About the Creator</span>
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-[#1A6EF0] dark:text-[#64B5F6] text-[10px] font-bold tracking-wider uppercase">
+                      <Info className="w-3 h-3" />
+                      <span>About</span>
                     </div>
                     <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                      <span>Hamza Rashid K</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onOpenAdmin) {
+                            onClose();
+                            onOpenAdmin();
+                          }
+                        }}
+                        className="text-left font-bold text-zinc-900 dark:text-white hover:text-[#1A6EF0] dark:hover:text-[#64B5F6] transition-colors cursor-pointer select-none focus:outline-none"
+                        title="Hamza Rashid K"
+                      >
+                        Hamza Rashid K
+                      </button>
                     </h3>
                     <p className="text-xs text-zinc-600 dark:text-zinc-400">
                       Creator of StudyMate & Memo Companion
@@ -967,7 +1123,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <User className="w-3.5 h-3.5" />
                       <span>Contact</span>
                     </div>
-                    <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Hamza Rashid K</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onOpenAdmin) {
+                          onClose();
+                          onOpenAdmin();
+                        }
+                      }}
+                      className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-[#1A6EF0] dark:hover:text-[#64B5F6] transition-colors cursor-pointer select-none"
+                    >
+                      Hamza Rashid K
+                    </button>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1054,7 +1221,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Mission Badge */}
                 <div className="p-3.5 rounded-2xl bg-[#1A6EF0]/5 dark:bg-[#1A6EF0]/10 border border-[#1A6EF0]/15 flex items-start gap-2.5">
                   <BookOpen className="w-4 h-4 text-[#1A6EF0] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                  <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
                     StudyMate was built with the belief that anyone can grasp complex knowledge when given calm pacing, honest grounding, and a friendly companion like Memo.
                   </p>
                 </div>
@@ -1067,7 +1234,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         <MessageCircle className="w-3.5 h-3.5 text-rose-500" />
                         <span>Have suggestions for improvement?</span>
                       </div>
-                      <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9]">
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                         Share feedback directly with the team to make StudyMate better
                       </p>
                     </div>
@@ -1084,39 +1251,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                 )}
 
-                {/* Admin Portal Section under About Me */}
-                {onOpenAdmin && (
-                  <div className="p-4.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-zinc-100/60 to-blue-500/10 dark:from-amber-950/20 dark:via-zinc-900/40 dark:to-blue-950/20 border border-amber-300/40 dark:border-amber-800/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                          <Lock className="w-3.5 h-3.5" />
-                        </div>
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-                          Admin System Panel
-                        </h4>
-                        <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/50 dark:border-amber-800">
-                          Restricted
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
-                        Authorized oversight for total uploads, document contents archive, active user sessions, and feedback management.
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        onOpenAdmin();
-                      }}
-                      className="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Open Admin Panel</span>
-                    </button>
-                  </div>
-                )}
+                {/* Admin Portal is tucked discretely behind creator name "Hamza Rashid K" */}
               </div>
             </div>
           )}
@@ -1124,14 +1259,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={handleResetDefaults}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset to defaults</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleResetDefaults}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset to defaults</span>
+            </button>
+
+            {hasSeenTour && (
+              <button
+                type="button"
+                onClick={handleReopenTour}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-500 hover:text-[#1A6EF0] dark:hover:text-[#64B5F6] hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>Show guide</span>
+              </button>
+            )}
+          </div>
 
           <button
             type="button"

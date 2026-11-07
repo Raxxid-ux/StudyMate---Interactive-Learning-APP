@@ -67,7 +67,7 @@ export const PracticeHub: React.FC<PracticeHubProps> = ({
           </div>
 
           {/* Segmented Control Chips */}
-          <nav className="flex items-center gap-1.5 overflow-x-auto no-scrollbar" aria-label="Practice tools">
+          <nav className="flex items-center gap-1.5 overflow-x-auto tabs-container no-scrollbar" aria-label="Practice tools">
             <button
               type="button"
               onClick={() => setActivePracticeTab('flashcards')}

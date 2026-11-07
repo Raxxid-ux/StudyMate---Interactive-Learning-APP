@@ -215,7 +215,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 id="admin-title" className="text-base sm:text-lg font-bold text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+                <h2 id="admin-title" className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                   Admin System Portal
                 </h2>
                 {isAuthenticated && (
@@ -224,7 +224,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 System metrics, upload history, user sessions, and feedback audit
               </p>
             </div>
@@ -263,7 +263,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
                 Administrator Verification
               </h3>
-              <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 This portal provides authorized oversight on uploaded document contents, active users, and system feedback.
               </p>
             </div>
@@ -304,7 +304,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
           /* AUTHENTICATED ADMIN DASHBOARD */
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Top Navigation Tabs */}
-            <div className="flex items-center gap-1 px-6 py-2 bg-zinc-100/60 dark:bg-zinc-900/60 border-b border-zinc-200/60 dark:border-zinc-800/60 overflow-x-auto shrink-0">
+            <div className="flex items-center gap-1 px-6 py-2 bg-zinc-100/60 dark:bg-zinc-900/60 border-b border-zinc-200/60 dark:border-zinc-800/60 overflow-x-auto shrink-0 tabs-container no-scrollbar">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`py-2 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
@@ -371,10 +371,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   {/* KPI Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                     <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                         Total Uploads
                       </div>
-                      <div className="text-2xl sm:text-3xl font-extrabold text-[#3A3F4F] dark:text-[#F1F3F7] tabular-nums">
+                      <div className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tabular-nums">
                         {uploads.length}
                       </div>
                       <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
@@ -383,37 +383,37 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                     </div>
 
                     <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                         Files Processed
                       </div>
                       <div className="text-2xl sm:text-3xl font-extrabold text-[#1A6EF0] dark:text-[#64B5F6] tabular-nums">
                         {uploads.reduce((acc, u) => acc + (u.fileNames?.length || 1), 0)}
                       </div>
-                      <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] font-medium">
+                      <div className="text-[11px] text-zinc-600 dark:text-zinc-400 font-medium">
                         PDFs, TXT & Markdown
                       </div>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                         Active Users
                       </div>
                       <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums">
                         {users.length || 2}
                       </div>
-                      <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] font-medium">
+                      <div className="text-[11px] text-zinc-600 dark:text-zinc-400 font-medium">
                         Active Scholars & Learners
                       </div>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                         User Feedbacks
                       </div>
                       <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 tabular-nums">
                         {feedbacks.length}
                       </div>
-                      <div className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] font-medium">
+                      <div className="text-[11px] text-zinc-600 dark:text-zinc-400 font-medium">
                         Rating: {stats.averageRating} / 5.0
                       </div>
                     </div>
@@ -424,7 +424,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                     {/* Latest Uploads Snippet */}
                     <div className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/40 space-y-3">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center gap-1.5">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                           <FileText className="w-3.5 h-3.5 text-[#1A6EF0]" />
                           <span>Recent Upload Highlights</span>
                         </h4>
@@ -464,7 +464,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                     {/* Latest Feedbacks Snippet */}
                     <div className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/40 space-y-3">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center gap-1.5">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                           <MessageCircle className="w-3.5 h-3.5 text-rose-500" />
                           <span>Latest User Feedback</span>
                         </h4>

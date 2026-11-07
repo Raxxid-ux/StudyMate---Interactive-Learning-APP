@@ -13,15 +13,15 @@
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background-color: #EDF0F5;
-    color: #3A3F4F;
+    background-color: #F4F7F4;
+    color: #1A2E22;
     line-height: 1.7;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .dark body {
-    background-color: #12151B;
-    color: #F1F3F7;
+    background-color: #0E1611;
+    color: #ECFDF5;
   }
 
   /* THEME 1: MEADOW SAGE (Default benchmark - soft, calm, airy, safe, refined sage palette with accessible contrast) */
@@ -224,3 +224,415 @@ html {
   animation: memoPerpetualFloat 3.6s ease-in-out infinite;
   will-change: transform;
 }
+
+/* ==========================================================================
+   BRAND-ALIGNED MINIMAL SCROLLBAR & GESTURE SCROLLING SYSTEM
+   - Desktop: Minimal, unobtrusive, brand-tinted thin scrollbars with smooth hover.
+   - Mobile / Touch: Gesture-driven fluid momentum scrolling with invisible scrollbars.
+   - Horizontal Tabs: Zero-distraction gesture swipe scrolling (.tabs-container, .no-scrollbar).
+   ========================================================================== */
+
+/* 1. Global Standard Scrollbar (Desktop / Non-Touch) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Dark Mode Global Scrollbar */
+.dark * {
+  scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
+}
+
+/* Theme 1: Meadow Sage (Soft Sage-Gray Tint) */
+html[data-theme="meadow"] * {
+  scrollbar-color: rgba(130, 160, 140, 0.4) transparent;
+}
+html[data-theme="meadow"].dark * {
+  scrollbar-color: rgba(70, 100, 80, 0.45) transparent;
+}
+
+/* Theme 2: Cosmic Midnight */
+html[data-theme="cosmic"] * {
+  scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+}
+
+/* Theme 5: High Contrast */
+html[data-theme="high-contrast"] * {
+  scrollbar-color: #555555 transparent;
+}
+
+/* Theme 6: Dark Academia (Warm Scholar Bronze / Parchment) */
+html[data-theme="academia"] * {
+  scrollbar-color: rgba(180, 160, 135, 0.5) transparent;
+}
+html[data-theme="academia"].dark * {
+  scrollbar-color: rgba(100, 85, 70, 0.55) transparent;
+}
+
+/* WebKit Custom Scrollbar (Chrome, Safari, Edge, Electron) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.65);
+}
+
+html[data-theme="meadow"] ::-webkit-scrollbar-thumb {
+  background-color: rgba(130, 160, 140, 0.4);
+}
+html[data-theme="meadow"] ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(34, 197, 94, 0.55);
+}
+html[data-theme="meadow"].dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(52, 90, 70, 0.5);
+}
+html[data-theme="meadow"].dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(34, 197, 94, 0.7);
+}
+
+html[data-theme="academia"] ::-webkit-scrollbar-thumb {
+  background-color: rgba(180, 160, 135, 0.5);
+}
+html[data-theme="academia"] ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(140, 115, 85, 0.75);
+}
+html[data-theme="academia"].dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 85, 70, 0.55);
+}
+html[data-theme="academia"].dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 135, 110, 0.75);
+}
+
+/* 2. Mobile & Touch: Gesture-Based Scrolling (Hide visual scrollbars for clean, distraction-free touch gestures) */
+@media (pointer: coarse), (max-width: 768px) {
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+/* 3. Horizontal Tab Containers & Gesture-Scrolled Ribbons (.tabs-container, .no-scrollbar, .gesture-scroll-x) */
+.tabs-container,
+.no-scrollbar,
+.gesture-scroll-x {
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none !important; /* Firefox & modern standard */
+  -ms-overflow-style: none !important; /* IE / legacy Edge */
+}
+
+.tabs-container::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.gesture-scroll-x::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Chromium Edge */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Minimalist explicit custom scrollbar class */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.45);
+  border-radius: 9999px;
+}
+
+/* ==========================================================================
+   GLASS ULTRA-MODERN PROGRESS BAR (USER PROVIDED ARCHITECTURE)
+   ========================================================================== */
+
+:root {
+  --size: 0.85rem;
+}
+
+progress.studymate-progress,
+.studymate-progress progress,
+progress {
+  --color-1: oklch(0.82 0.16 160 / 0.85);
+  --color-2: oklch(0.72 0.18 190 / 0.85);
+  --color-3: oklch(0.62 0.22 240 / 0.85);
+  --color-4: oklch(0.52 0.24 260 / 0.85);
+
+  --gradient-start: var(--color-1);
+  --gradient-end: var(--color-3);
+
+  --bg: oklch(0.94 0.02 160 / 0.75);
+
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  font-size: var(--size, 0.85rem);
+  height: 2.2em;
+  border-radius: 99vw;
+  border: none;
+  padding: 0.2em;
+  container-type: inline-size;
+  overflow: hidden;
+  position: relative;
+  display: block;
+
+  background: linear-gradient(
+    to bottom,
+    oklch(from var(--bg) calc(l - 0.08) c h),
+    oklch(from var(--bg) l c h) 66%
+  ) border-box;
+
+  box-shadow: inset 0 0 0 max(1px, 0.05em) oklch(from var(--bg) calc(l - 0.1) c h / 0.33);
+}
+
+.dark progress.studymate-progress,
+.dark progress {
+  --bg: oklch(0.22 0.02 160 / 0.75);
+}
+
+/* Chrome / Safari / Edge / WebKit progress container */
+progress::-webkit-progress-bar {
+  appearance: none;
+  background: transparent;
+  border-radius: 99vw;
+}
+
+/* Chrome / Safari / Edge / WebKit progress value fill */
+progress::-webkit-progress-value {
+  width: 100%;
+  height: 100%;
+  border-radius: 99vw;
+  border: max(1px, 0.1em) transparent solid;
+  padding-inline: 0.75em;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  --color-gradient: linear-gradient(
+    to right,
+    var(--color-1) 5%,
+    var(--color-2),
+    var(--color-3) 50%,
+    var(--color-4)
+  );
+
+  background:
+    radial-gradient(
+      70% 2em at center 120%,
+      oklch(0.99 0.025 260 / 100%) 0%,
+      oklch(0.99 0.025 260 / 88%) 21%,
+      oklch(0.99 0.025 260 / 75%) 30%,
+      oklch(0.99 0.025 260 / 64%) 39%,
+      oklch(0.99 0.025 260 / 52%) 46%,
+      oklch(0.99 0.025 260 / 41%) 54%,
+      oklch(0.99 0.025 260 / 31%) 61%,
+      oklch(0.99 0.025 260 / 21%) 69%,
+      oklch(0.99 0.025 260 / 12%) 79%,
+      oklch(0.99 0.025 260 / 0%) 100%
+    ) padding-box,
+    var(--color-gradient) padding-box,
+    linear-gradient(
+      to bottom,
+      oklch(0.95 0.01 260),
+      oklch(0.92 0.018 260 / 80%) 33%,
+      oklch(0.99 0.01 260 / 80%)
+    ) padding-box,
+    linear-gradient(
+      165deg,
+      oklch(0.94 0.025 260 / 80%) 25%,
+      oklch(0.99 0.01 260 / 80%)
+    ) border-box;
+
+  background-blend-mode: normal, overlay, normal, normal;
+  background-size: cover, 100cqw 100%, cover, cover;
+
+  box-shadow:
+    inset 0.2em 0.2em 0.3em -0.1em oklch(0.92 0.018 260 / 80%),
+    inset -0.2em -0.2em 0.3em -0.1em oklch(0.98 0.018 260 / 80%),
+    oklch(0.35 0.1 260 / 0.05) 0px max(4px, 0.3em) 0.3em 0px,
+    oklch(0.35 0.1 260 / 0.07) 0px max(2px, 0.18em) 0.18em 0px;
+}
+
+/* Firefox replica */
+progress::-moz-progress-bar {
+  width: 100%;
+  height: 100%;
+  border-radius: 99vw;
+  border: max(1px, 0.1em) transparent solid;
+  padding-inline: 0.75em;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  --color-gradient: linear-gradient(
+    to right,
+    var(--color-1) 5%,
+    var(--color-2),
+    var(--color-3) 50%,
+    var(--color-4)
+  );
+
+  background:
+    radial-gradient(
+      70% 2em at center 120%,
+      oklch(0.99 0.025 260 / 100%) 0%,
+      oklch(0.99 0.025 260 / 88%) 21%,
+      oklch(0.99 0.025 260 / 75%) 30%,
+      oklch(0.99 0.025 260 / 64%) 39%,
+      oklch(0.99 0.025 260 / 52%) 46%,
+      oklch(0.99 0.025 260 / 41%) 54%,
+      oklch(0.99 0.025 260 / 31%) 61%,
+      oklch(0.99 0.025 260 / 21%) 69%,
+      oklch(0.99 0.025 260 / 12%) 79%,
+      oklch(0.99 0.025 260 / 0%) 100%
+    ) padding-box,
+    var(--color-gradient) padding-box,
+    linear-gradient(
+      to bottom,
+      oklch(0.95 0.01 260),
+      oklch(0.92 0.018 260 / 80%) 33%,
+      oklch(0.99 0.01 260 / 80%)
+    ) padding-box,
+    linear-gradient(
+      165deg,
+      oklch(0.94 0.025 260 / 80%) 25%,
+      oklch(0.99 0.01 260 / 80%)
+    ) border-box;
+
+  background-blend-mode: normal, overlay, normal, normal;
+  background-size: cover, 100cqw 100%, cover, cover;
+
+  box-shadow:
+    inset 0.2em 0.2em 0.3em -0.1em oklch(0.92 0.018 260 / 80%),
+    inset -0.2em -0.2em 0.3em -0.1em oklch(0.98 0.018 260 / 80%),
+    oklch(0.35 0.1 260 / 0.05) 0px max(4px, 0.3em) 0.3em 0px,
+    oklch(0.35 0.1 260 / 0.07) 0px max(2px, 0.18em) 0.18em 0px;
+}
+
+/* Indeterminate animation */
+progress:indeterminate::-webkit-progress-value {
+  inline-size: 100% !important;
+  --color-gradient: linear-gradient(
+    to right,
+    oklch(from var(--gradient-start) l c h / 0) 0%,
+    oklch(from var(--gradient-start) l c h / 1) 11.5%,
+    oklch(from var(--gradient-start) l c h / 1) 13.5%,
+    oklch(from var(--gradient-end) l c h / 0),
+    oklch(from var(--gradient-end) l c h / 1) 36.5%,
+    oklch(from var(--gradient-end) l c h / 1) 38.5%,
+    oklch(from var(--gradient-end) l c h / 0) 50%,
+    oklch(from var(--gradient-start) l c h / 1) 61.5%,
+    oklch(from var(--gradient-start) l c h / 1) 63.5%,
+    oklch(from var(--gradient-start) l c h / 0),
+    oklch(from var(--gradient-end) l c h / 1) 86.5%,
+    oklch(from var(--gradient-end) l c h / 1) 88.5%,
+    oklch(from var(--gradient-end) l c h / 0) 100%
+  ) repeat;
+  background-size: 200% 100%;
+  animation: progress-bg-scroll 1.4s linear infinite;
+}
+
+progress:indeterminate::-moz-progress-bar {
+  --color-gradient: linear-gradient(
+    to right,
+    oklch(from var(--gradient-start) l c h / 0) 0%,
+    oklch(from var(--gradient-start) l c h / 1) 11.5%,
+    oklch(from var(--gradient-start) l c h / 1) 13.5%,
+    oklch(from var(--gradient-end) l c h / 0),
+    oklch(from var(--gradient-end) l c h / 1) 36.5%,
+    oklch(from var(--gradient-end) l c h / 1) 38.5%,
+    oklch(from var(--gradient-end) l c h / 0) 50%,
+    oklch(from var(--gradient-start) l c h / 1) 61.5%,
+    oklch(from var(--gradient-start) l c h / 1) 63.5%,
+    oklch(from var(--gradient-start) l c h / 0),
+    oklch(from var(--gradient-end) l c h / 1) 86.5%,
+    oklch(from var(--gradient-end) l c h / 1) 88.5%,
+    oklch(from var(--gradient-end) l c h / 0) 100%
+  ) repeat;
+  background-size: 200% 100%;
+  animation: progress-bg-scroll 1.4s linear infinite;
+}
+
+@keyframes progress-bg-scroll {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* User's specified theme presets */
+progress[data-style="sunset"] {
+  --color-1: oklch(0.66 0.25 30 / 1);
+  --color-2: oklch(0.72 0.2 55 / 1);
+  --color-3: oklch(0.79 0.2 80 / 1);
+  --color-4: oklch(0.96 0.24 90 / 1);
+  --gradient-start: var(--color-1);
+  --gradient-end: var(--color-3);
+}
+
+progress[data-style="ice"] {
+  --color-1: oklch(1 0.06 195 / 1);
+  --color-2: oklch(0.88 0.13 195 / 1);
+  --color-3: oklch(0.58 0.24 233 / 1);
+  --color-4: oklch(0.66 0.28 262 / 1);
+  --gradient-start: var(--color-2);
+  --gradient-end: var(--color-4);
+}
+
+progress[data-style="slime"] {
+  --color-1: oklch(0.66 0.25 300 / 1);
+  --color-2: oklch(0.8 0.1 200 / 1);
+  --color-3: oklch(0.84 0.2 154 / 1);
+  --color-4: oklch(0.9 0.25 130 / 1);
+}
+
+progress[data-style="AI"] {
+  --color-1: oklch(0.65 0.25 263 / 1);
+  --color-2: oklch(0.6 0.27 272 / 1);
+  --color-3: oklch(0.55 0.3 288 / 1);
+  --color-4: oklch(0.55 0.33 306 / 1);
+}
+
+progress[data-style="meadow"] {
+  --color-1: oklch(0.82 0.18 160 / 1);
+  --color-2: oklch(0.72 0.16 190 / 1);
+  --color-3: oklch(0.62 0.22 240 / 1);
+  --color-4: oklch(0.55 0.24 260 / 1);
+  --gradient-start: var(--color-1);
+  --gradient-end: var(--color-3);
+}
+
+

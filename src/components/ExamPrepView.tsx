@@ -158,7 +158,7 @@ export const ExamPrepView: React.FC<ExamPrepViewProps> = ({ course, onJumpToLess
                 Fast Retention
               </span>
             </div>
-            <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
               High-yield recall drills and 1-page review sheet for rapid memorization before exams.
             </p>
           </div>
@@ -179,7 +179,7 @@ export const ExamPrepView: React.FC<ExamPrepViewProps> = ({ course, onJumpToLess
       </div>
 
       {/* Sub-mode Navigation Buttons */}
-      <div className="flex items-center gap-2 border-b border-zinc-200/80 dark:border-zinc-800 pb-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-zinc-200/80 dark:border-zinc-800 pb-3 overflow-x-auto tabs-container no-scrollbar">
         <button
           type="button"
           onClick={() => setSubMode('sprint')}

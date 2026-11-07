@@ -542,7 +542,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Settings className="w-4 h-4 text-zinc-500" />
                   <div>
-                    <div className="font-semibold">Settings & Creator Story</div>
+                    <div className="font-semibold">Settings & About</div>
                     <div className="text-[10px] text-zinc-500 font-normal">
                       Themes, neurodiversity aids, notes from Hamza
                     </div>

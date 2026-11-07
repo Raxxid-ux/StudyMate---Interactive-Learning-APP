@@ -409,7 +409,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
             </div>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight leading-snug">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-zinc-900 dark:text-zinc-100 tracking-tight leading-snug">
             What would you like to learn today?
           </h2>
 
@@ -424,7 +424,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 <Lightbulb className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span>{HOME_ROTATING_MESSAGES[currentSubtitleIndex].label}</span>
               </div>
-              <p className="text-[#5F6573] dark:text-[#A6ACB9] text-sm sm:text-base leading-relaxed text-center px-4">
+              <p className="text-zinc-600 dark:text-zinc-300 text-sm sm:text-base leading-relaxed text-center px-4">
                 {HOME_ROTATING_MESSAGES[currentSubtitleIndex].text}
               </p>
             </div>
@@ -492,7 +492,17 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
         </div>
 
         {/* Upload Box Container */}
-        <div className="bg-[#F9FAFC] dark:bg-[#1A1E27] rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-[0_4px_24px_rgba(0,0,0,0.03)] p-6 sm:p-9 space-y-6">
+        <div
+          className={`rounded-3xl border shadow-[0_4px_24px_rgba(0,0,0,0.03)] p-6 sm:p-9 space-y-6 transition-colors ${
+            theme === 'academia'
+              ? 'bg-[#F9F6EE] dark:bg-[#1E1914] border-[#E4D8C8] dark:border-[#382E25]'
+              : theme === 'cosmic'
+              ? 'bg-[#121824] border-slate-800'
+              : theme === 'high-contrast'
+              ? 'bg-[#0A0A0A] border-white'
+              : 'bg-white dark:bg-[#131A15] border-zinc-200/80 dark:border-zinc-800'
+          }`}
+        >
           {/* INFORMATIVE MULTI-STAGE LOADING SCREEN */}
           {isProcessing || isReadingFiles ? (
             <div className="py-6 px-2 sm:px-4 space-y-6">
@@ -514,13 +524,19 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 <p className="text-sm font-semibold text-[#1A6EF0] dark:text-[#64B5F6] animate-pulse">
                   {progressStep || 'Reading and de-noising document contents...'}
                 </p>
-                <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] max-w-md mx-auto">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
                   Memo is preparing Lesson 1 first so you can begin reading and learning with zero delay.
                 </p>
               </div>
 
               {/* Clean, Honest Curriculum Progress State */}
-              <div className="bg-white/80 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 sm:p-5 space-y-3.5 shadow-2xs">
+              <div
+                className={`rounded-2xl border p-4 sm:p-5 space-y-3.5 shadow-2xs ${
+                  theme === 'academia'
+                    ? 'bg-[#F3EFE6] dark:bg-[#18130E] border-[#E4D8C8] dark:border-[#382E25]'
+                    : 'bg-zinc-50/90 dark:bg-zinc-900/60 border-zinc-200/80 dark:border-zinc-800'
+                }`}
+              >
                 <div className="flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   <span className="uppercase tracking-wider">Curriculum Pipeline</span>
                   <span className="tabular-nums font-mono text-[#1A6EF0] dark:text-[#64B5F6]">
@@ -528,12 +544,24 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                   </span>
                 </div>
 
-                {/* Honest Linear Progress Bar */}
-                <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-[#1A6EF0] h-full transition-all duration-500 rounded-full"
-                    style={{ width: `${Math.round(((activeStageIndex + 0.5) / stages.length) * 100)}%` }}
-                  />
+                {/* User's Glass Modern Progress Bar */}
+                <div className="w-full relative flex flex-col items-center py-1">
+                  <div className="w-full relative">
+                    <progress
+                      value={activeStageIndex + 0.5}
+                      max={stages.length}
+                      className="studymate-progress w-full"
+                      data-style={theme === 'academia' ? 'sunset' : 'meadow'}
+                      aria-valuenow={Math.round(((activeStageIndex + 0.5) / stages.length) * 100)}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-zinc-700 dark:text-zinc-200 drop-shadow-xs font-mono">
+                        {Math.round(((activeStageIndex + 0.5) / stages.length) * 100)}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Stages List: collapsed completed details by default */}
@@ -596,7 +624,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                           </div>
                           {/* Collapse completed stage descriptions to reduce cognitive clutter */}
                           {isCurrent && (
-                            <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] leading-snug mt-0.5">
+                            <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug mt-0.5">
                               {stg.desc}
                             </p>
                           )}
@@ -614,10 +642,10 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 <AlertCircle className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-semibold text-[#3A3F4F] dark:text-[#F1F3F7]">
+                <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
                   Something interrupted this step
                 </h3>
-                <p className="text-xs sm:text-sm text-[#5F6573] dark:text-[#A6ACB9] max-w-sm mx-auto">
+                <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-sm mx-auto">
                   {errorMessage}
                 </p>
               </div>
@@ -631,7 +659,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 </button>
                 <button
                   onClick={() => setSelectedFiles([])}
-                  className="px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-[#3A3F4F] dark:text-[#F1F3F7] font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-sm cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-sm cursor-pointer"
                 >
                   Choose another file
                 </button>
@@ -676,16 +704,16 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                     : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white/70 dark:bg-zinc-900/40'
                 }`}
               >
-                <div className="w-12 h-12 mx-auto rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center justify-center mb-3.5 shadow-2xs">
+                <div className="w-12 h-12 mx-auto rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 flex items-center justify-center mb-3.5 shadow-2xs">
                   <Upload className="w-6 h-6 text-[#1A6EF0]" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-base font-bold text-[#3A3F4F] dark:text-[#F1F3F7]">
+                  <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                     {selectedFiles.length > 0
                       ? 'Click or drop to add more documents'
                       : 'Click to select documents or drag & drop here'}
                   </p>
-                  <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Supports multiple files · PDF, TXT, or Markdown (MD)
                   </p>
                 </div>
@@ -703,7 +731,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 <div className="space-y-3">
                   <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#3A3F4F] dark:text-[#F1F3F7]">
+                      <span className="text-xs font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">
                         Selected Documents ({selectedFiles.length})
                       </span>
                       <span className="text-[11px] text-zinc-500 tabular-nums">
@@ -744,10 +772,10 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                               <FileText className="w-4.5 h-4.5" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-xs sm:text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] truncate">
+                              <p className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                                 {file.name}
                               </p>
-                              <div className="flex items-center gap-2 text-[11px] text-[#5F6573] dark:text-[#A6ACB9]">
+                              <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
                                 <span className="font-mono uppercase">
                                   {isPdf ? 'PDF Document' : 'Text / Markdown'}
                                 </span>
@@ -802,7 +830,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
         {/* Quick Sample Documents */}
         {!isProcessing && !isReadingFiles && (
           <div className="space-y-3 pt-2">
-            <span className="text-xs uppercase font-semibold tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+            <span className="text-xs uppercase font-semibold tracking-wider text-zinc-500 dark:text-zinc-400">
               Or try with a sample document
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -810,18 +838,22 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 <button
                   key={sample.name}
                   onClick={() => handleSelectSample(sample)}
-                  className="text-left p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-[#F9FAFC] dark:bg-[#1A1E27] hover:border-[#1A6EF0] transition-all group cursor-pointer shadow-xs"
+                  className={`text-left p-4 rounded-2xl border transition-all group cursor-pointer shadow-xs ${
+                    theme === 'academia'
+                      ? 'bg-[#F9F6EE] dark:bg-[#1E1914] border-[#E4D8C8] dark:border-[#382E25] hover:border-[#8C6239]'
+                      : 'bg-white dark:bg-zinc-850 border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]'
+                  }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                       .{sample.extension}
                     </span>
                     <FileText className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#1A6EF0] transition-colors" />
                   </div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] line-clamp-1 group-hover:text-[#1A6EF0] transition-colors">
+                  <h4 className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-1 group-hover:text-[#1A6EF0] transition-colors">
                     {sample.name}
                   </h4>
-                  <p className="text-[11px] text-[#5F6573] dark:text-[#A6ACB9] line-clamp-2 mt-1">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1">
                     {sample.description}
                   </p>
                 </button>
@@ -829,7 +861,13 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
             </div>
 
             {/* Meet Memo 3D Study Companion Card with Quick Feedback Shortcut */}
-            <div className="mt-6 p-5 rounded-3xl bg-white/70 dark:bg-[#1A1E27]/70 border border-zinc-200/80 dark:border-zinc-800 shadow-xs backdrop-blur-xs flex flex-col sm:flex-row items-center gap-4 transition-all hover:border-[#22D08B]/60">
+            <div
+              className={`mt-6 p-5 rounded-3xl border shadow-xs backdrop-blur-xs flex flex-col sm:flex-row items-center gap-4 transition-all hover:border-[#22D08B]/60 ${
+                theme === 'academia'
+                  ? 'bg-[#F9F6EE]/90 dark:bg-[#1E1914]/90 border-[#E4D8C8] dark:border-[#382E25]'
+                  : 'bg-white/90 dark:bg-zinc-850/90 border-zinc-200/80 dark:border-zinc-800'
+              }`}
+            >
               <div className="w-20 h-20 shrink-0 flex items-center justify-center">
                 <MemoThreeCanvas
                   size="compact"
@@ -841,12 +879,12 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
 
               <div className="space-y-1 text-center sm:text-left flex-1">
                 <div className="flex items-center justify-center sm:justify-start gap-2">
-                  <h4 className="font-semibold text-sm text-[#3A3F4F] dark:text-[#F1F3F7]">
+                  <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
                     Meet Memo · 3D Study Companion
                   </h4>
                   <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-pulse" />
                 </div>
-                <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                   A cute minimal white pen with futuristic green-to-blue lighting. Ask doubts anytime grounded strictly in your document, configure your pace, and share feedback anytime.
                 </p>
               </div>
@@ -876,7 +914,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                   <button
                     type="button"
                     onClick={onOpenSettings}
-                    className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] border border-zinc-200 dark:border-zinc-700 hover:border-[#1A6EF0] transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-[#1A6EF0] transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Settings className="w-3.5 h-3.5 text-zinc-500" />
                     <span>Settings</span>

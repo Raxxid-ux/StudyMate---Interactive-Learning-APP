@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // MOBILE VIEW: Collapsible Dropdown Selector (top of screen on mobile)
   // =========================================================================
   const renderMobileView = () => (
-    <div className="lg:hidden w-full bg-[#F9FAFC] dark:bg-[#161A22] border-b border-zinc-200/80 dark:border-zinc-800 shrink-0">
+    <div className="lg:hidden w-full bg-white dark:bg-zinc-900 border-b border-zinc-200/80 dark:border-zinc-800 shrink-0">
       {/* Compact dropdown trigger bar */}
       <div className="px-4 py-3 flex items-center justify-between gap-3">
         <button
@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#1A6EF0] text-white">
               Lesson {currentSectionIndex + 1}/{totalSections}
             </span>
-            <span className="text-xs sm:text-sm font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] truncate">
+            <span className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
               {currentSection?.title || 'Choose a lesson'}
             </span>
           </div>
@@ -112,7 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-200/60 dark:border-zinc-800/60 animate-fadeIn">
           {/* Progress Bar in dropdown */}
           <div className="pt-2 space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-[#5F6573] dark:text-[#A6ACB9]">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
               <span>Course Progress</span>
               <span className="tabular-nums">
                 {completedCount} of {totalSections} lessons completed ({percentCompleted}%)
@@ -166,13 +166,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${chipBg}`}>
                       Lesson {idx + 1}
                     </span>
-                    <span className="text-xs font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] truncate">
+                    <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                       {section.title}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[10px] text-[#5F6573] dark:text-[#A6ACB9]">
+                    <span className="text-[10px] text-zinc-600 dark:text-zinc-400">
                       {chipLabel}
                     </span>
                     {isCompleted ? (
@@ -210,7 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (isCollapsed) {
       return (
         <aside
-          className="hidden lg:flex w-14 shrink-0 bg-[#F9FAFC] dark:bg-[#161A22] border-r border-zinc-200/80 dark:border-zinc-800 flex-col items-center py-4 justify-between h-full transition-all select-none"
+          className="hidden lg:flex w-14 shrink-0 bg-white dark:bg-zinc-900 border-r border-zinc-200/80 dark:border-zinc-800 flex-col items-center py-4 justify-between h-full transition-all select-none"
           aria-label="Collapsed study tools panel"
         >
           <div className="flex flex-col items-center gap-4 w-full">
@@ -297,7 +297,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     // Expanded full-height left panel
     return (
       <aside
-        className="hidden lg:flex w-84 xl:w-92 2xl:w-96 shrink-0 bg-[#F9FAFC] dark:bg-[#161A22] border-r border-zinc-200/80 dark:border-zinc-800 flex-col h-full overflow-hidden transition-all shadow-xs"
+        className="hidden lg:flex w-84 xl:w-92 2xl:w-96 shrink-0 bg-white dark:bg-zinc-900 border-r border-zinc-200/80 dark:border-zinc-800 flex-col h-full overflow-hidden transition-all shadow-xs"
         aria-label="StudyMate left companion panel"
       >
         {/* Header Tabs Strip */}
@@ -310,7 +310,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'sections'
                   ? 'bg-white dark:bg-zinc-900 text-[#1A6EF0] dark:text-[#64B5F6] shadow-2xs'
-                  : 'text-[#5F6573] dark:text-[#A6ACB9] hover:text-[#3A3F4F] dark:hover:text-[#F1F3F7]'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5 shrink-0" />
@@ -323,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'memo'
                   ? 'bg-white dark:bg-zinc-900 text-[#1A6EF0] dark:text-[#64B5F6] shadow-2xs'
-                  : 'text-[#5F6573] dark:text-[#A6ACB9] hover:text-[#3A3F4F] dark:hover:text-[#F1F3F7]'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5 shrink-0" />
@@ -336,7 +336,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'notes'
                   ? 'bg-white dark:bg-zinc-900 text-[#1A6EF0] dark:text-[#64B5F6] shadow-2xs'
-                  : 'text-[#5F6573] dark:text-[#A6ACB9] hover:text-[#3A3F4F] dark:hover:text-[#F1F3F7]'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
               }`}
             >
               <FileText className="w-3.5 h-3.5 shrink-0" />
@@ -361,7 +361,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Top Progress Overview */}
             <div className="p-4 border-b border-zinc-200/80 dark:border-zinc-800 space-y-2.5 shrink-0 bg-white/40 dark:bg-zinc-900/30">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#5F6573] dark:text-[#A6ACB9]">
+              <div className="flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                 <span className="uppercase tracking-wider">Course Progress</span>
                 <span className="tabular-nums">
                   {completedCount} of {totalSections} ({percentCompleted}%)
@@ -433,7 +433,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           >
                             Lesson {idx + 1}
                           </span>
-                          <span className="text-[10px] text-[#5F6573] dark:text-[#A6ACB9]">
+                          <span className="text-[10px] text-zinc-600 dark:text-zinc-400">
                             {chipLabel}
                           </span>
                         </div>
@@ -443,7 +443,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             isSelected
                               ? 'text-[#1A6EF0]'
                               : isReady
-                              ? 'text-[#3A3F4F] dark:text-[#F1F3F7]'
+                              ? 'text-zinc-900 dark:text-zinc-100'
                               : 'text-zinc-400 dark:text-zinc-600'
                           }`}
                           title={section.title}
@@ -520,7 +520,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
                   Memo Companion
                 </h4>
-                <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
                   Tap Memo anytime to spin, react, and clarify doubts.
                 </p>
               </div>
@@ -536,7 +536,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={onOpenMemo}
-                  className="w-full text-left p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]/50 hover:bg-[#1A6EF0]/5 transition-all text-xs font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center justify-between cursor-pointer group shadow-2xs"
+                  className="w-full text-left p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]/50 hover:bg-[#1A6EF0]/5 transition-all text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center justify-between cursor-pointer group shadow-2xs"
                 >
                   <span>Summarize this lesson</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#1A6EF0] transition-colors" />
@@ -545,7 +545,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={onOpenMemo}
-                  className="w-full text-left p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]/50 hover:bg-[#1A6EF0]/5 transition-all text-xs font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center justify-between cursor-pointer group shadow-2xs"
+                  className="w-full text-left p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]/50 hover:bg-[#1A6EF0]/5 transition-all text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center justify-between cursor-pointer group shadow-2xs"
                 >
                   <span>Explain with a real-life analogy</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#1A6EF0] transition-colors" />
@@ -554,7 +554,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={onOpenMemo}
-                  className="w-full text-left p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]/50 hover:bg-[#1A6EF0]/5 transition-all text-xs font-semibold text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center justify-between cursor-pointer group shadow-2xs"
+                  className="w-full text-left p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-[#1A6EF0]/50 hover:bg-[#1A6EF0]/5 transition-all text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center justify-between cursor-pointer group shadow-2xs"
                 >
                   <span>Verify quotes against original text</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#1A6EF0] transition-colors" />
@@ -591,7 +591,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {keyPoints.map((point, i) => (
                     <div
                       key={i}
-                      className="p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-xs text-[#3A3F4F] dark:text-[#F1F3F7] leading-relaxed shadow-2xs flex items-start gap-2"
+                      className="p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 leading-relaxed shadow-2xs flex items-start gap-2"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-[#1A6EF0] shrink-0 mt-1.5" />
                       <span>{point}</span>
@@ -599,7 +599,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] italic p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 italic p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
                   Key points for this lesson will appear here as you read.
                 </p>
               )}
@@ -622,7 +622,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <div className="text-xs font-bold text-[#1A6EF0] dark:text-[#64B5F6]">
                         {item.term}
                       </div>
-                      <div className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+                      <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                         {item.definition}
                       </div>
                     </div>
@@ -654,7 +654,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             <span className="font-semibold text-zinc-700 dark:text-zinc-300">
                               {item.label}:
                             </span>{' '}
-                            <span className="text-[#5F6573] dark:text-[#A6ACB9]">
+                            <span className="text-zinc-600 dark:text-zinc-400">
                               {item.detail}
                             </span>
                           </div>

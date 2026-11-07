@@ -246,7 +246,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
           <button
             type="button"
             onClick={toggleOpen}
-            className="mr-2.5 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 text-[#3A3F4F] dark:text-slate-200 text-xs font-medium shadow-md border border-slate-200/80 dark:border-slate-800 backdrop-blur-md transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto translate-x-2 group-hover:translate-x-0 cursor-pointer hover:border-[#2BA8F0]"
+            className="mr-2.5 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-200 text-xs font-medium shadow-md border border-slate-200/80 dark:border-slate-800 backdrop-blur-md transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto translate-x-2 group-hover:translate-x-0 cursor-pointer hover:border-[#2BA8F0]"
           >
             <span className="w-2 h-2 rounded-full bg-[#22D08B] animate-ping" />
             <span>Ask Memo · Doubts & Settings</span>
@@ -332,9 +332,6 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                     Memo
                   </h3>
                   <span className="w-2 h-2 rounded-full bg-[#006A4E] dark:bg-emerald-400 animate-pulse shrink-0" />
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    Companion
-                  </span>
                 </div>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
                   {currentSection
@@ -376,7 +373,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
           </div>
 
           {/* TAB SELECTOR */}
-          <div className="px-3 sm:px-4 pt-2 pb-2 bg-white dark:bg-[#1e2330] border-b border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto shrink-0">
+          <div className="px-3 sm:px-4 pt-2 pb-2 bg-white dark:bg-[#1e2330] border-b border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto shrink-0 tabs-container no-scrollbar">
             <button
               onClick={() => {
                 setActiveTab('doubts');
@@ -385,7 +382,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                 activeTab === 'doubts'
                   ? 'bg-[#1A6EF0] text-white shadow-sm'
-                  : 'text-[#5F6573] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
@@ -400,7 +397,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                 activeTab === 'config'
                   ? 'bg-[#1A6EF0] text-white shadow-sm'
-                  : 'text-[#5F6573] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -415,7 +412,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                 activeTab === 'playground'
                   ? 'bg-[#1A6EF0] text-white shadow-sm'
-                  : 'text-[#5F6573] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <Box className="w-3.5 h-3.5 shrink-0" />
@@ -428,7 +425,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
           {/* TAB CONTENT 1: ASK DOUBTS */}
           {activeTab === 'doubts' && (
-            <div className="flex-1 flex flex-col overflow-hidden bg-[#F9FAFC] dark:bg-[#171b24]">
+            <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-[#171b24]">
               {/* Messages scroll area */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
                 {messages.map((msg) => (
@@ -442,7 +439,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                       className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                         msg.sender === 'user'
                           ? 'bg-[#1A6EF0] text-white rounded-br-sm'
-                          : 'bg-white dark:bg-[#222836] text-[#3A3F4F] dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/60 rounded-bl-sm'
+                          : 'bg-white dark:bg-[#222836] text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/60 rounded-bl-sm'
                       }`}
                     >
                       {/* Message text */}
@@ -483,7 +480,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                             <button
                               key={idx}
                               onClick={() => handleSendMessage(prompt)}
-                              className="text-xs px-2.5 py-1 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#5F6573] dark:text-slate-300 hover:border-[#1A6EF0] hover:text-[#1A6EF0] dark:hover:border-[#22D08B] dark:hover:text-[#22D08B] transition-colors text-left"
+                              className="text-xs px-2.5 py-1 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#1A6EF0] hover:text-[#1A6EF0] dark:hover:border-[#22D08B] dark:hover:text-[#22D08B] transition-colors text-left"
                             >
                               {prompt}
                             </button>
@@ -561,7 +558,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     placeholder="Ask Memo any doubt about your document..."
-                    className="flex-1 bg-transparent text-sm text-[#3A3F4F] dark:text-slate-100 placeholder-slate-400 focus:outline-none"
+                    className="flex-1 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none"
                     disabled={isGenerating}
                   />
                   <button
@@ -579,7 +576,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
           {/* TAB CONTENT 2: STUDY CONFIGURATIONS */}
           {activeTab === 'config' && (
-            <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-[#F9FAFC] dark:bg-[#161A22] space-y-4">
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-slate-50 dark:bg-[#161A22] space-y-4">
               <div>
                 <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
                   Calm Learning Configurations
@@ -598,9 +595,6 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                       Recommended Calm Defaults
                     </span>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200">
-                    Low Stress
-                  </span>
                 </div>
 
                 <p className="text-xs text-emerald-950/80 dark:text-emerald-200/90 leading-relaxed">
@@ -779,12 +773,12 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
 
           {/* TAB CONTENT 3: MEMO CUSTOMIZE & 3D */}
           {activeTab === 'playground' && (
-            <div className="flex-1 flex flex-col p-4 sm:p-5 bg-[#F9FAFC] dark:bg-[#171b24] overflow-y-auto items-center space-y-3.5">
+            <div className="flex-1 flex flex-col p-4 sm:p-5 bg-slate-50 dark:bg-[#171b24] overflow-y-auto items-center space-y-3.5">
               <div className="text-center shrink-0">
-                <h4 className="font-semibold text-sm text-[#3A3F4F] dark:text-slate-200">
+                <h4 className="font-semibold text-sm text-slate-800 dark:text-slate-200">
                   Memo Customization & 3D Model
                 </h4>
-                <p className="text-xs text-[#5F6573] dark:text-slate-400 max-w-xs mx-auto">
+                <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xs mx-auto">
                   Move your mouse or tap Memo to see physics tilt, spins, and custom outfit accessories.
                 </p>
               </div>
@@ -810,11 +804,8 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                     <WitchHat className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 flex-wrap">
-                      <span>Halloween Theme</span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-orange-500 text-white uppercase tracking-wider">
-                        Special
-                      </span>
+                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      Halloween Theme
                     </div>
                     <p className="text-[10px] text-zinc-600 dark:text-zinc-400 truncate">
                       Witch Hat, Vampire Teeth & Spooky Glow
@@ -893,7 +884,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                       setMemoMood('happy');
                       playCalmChime(studyConfig.audioFeedback);
                     }}
-                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-[#22D08B] hover:text-[#22D08B] transition-colors cursor-pointer text-center"
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-300 hover:border-[#22D08B] hover:text-[#22D08B] transition-colors cursor-pointer text-center"
                   >
                     Happy
                   </button>
@@ -902,7 +893,7 @@ export const MemoChatbot: React.FC<MemoChatbotProps> = ({
                       setMemoMood('thinking');
                       playSoftTap(studyConfig.audioFeedback);
                     }}
-                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-[#3A3F4F] dark:text-slate-300 hover:border-[#2BA8F0] hover:text-[#2BA8F0] transition-colors cursor-pointer text-center"
+                    className="py-1.5 px-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-300 hover:border-[#2BA8F0] hover:text-[#2BA8F0] transition-colors cursor-pointer text-center"
                   >
                     Thinking
                   </button>

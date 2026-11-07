@@ -34,7 +34,7 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <FileSpreadsheet className="w-6 h-6 text-[#1A6EF0]" />
-            <h1 className="text-3xl font-light text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+            <h1 className="text-3xl font-light text-zinc-900 dark:text-zinc-100 tracking-tight">
               Content Audit
             </h1>
           </div>
@@ -42,24 +42,24 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
             STUDY DRAFT
           </span>
         </div>
-        <p className="text-sm text-[#5F6573] dark:text-[#A6ACB9]">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
           Audit report: lesson titles built, which document topics were merged, and the skipped content log.
         </p>
       </div>
 
       {/* Summary Chips */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-          <span className="text-[11px] font-semibold text-[#5F6573] dark:text-[#A6ACB9] uppercase tracking-wider">
+        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
+          <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Your Document
           </span>
-          <p className="font-semibold text-sm sm:text-base text-[#3A3F4F] dark:text-[#F1F3F7] truncate" title={course.documentTitle}>
+          <p className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 truncate" title={course.documentTitle}>
             {course.documentTitle}
           </p>
         </div>
 
-        <div className="p-5 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-          <span className="text-[11px] font-semibold text-[#5F6573] dark:text-[#A6ACB9] uppercase tracking-wider">
+        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
+          <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Sections Built
           </span>
           <p className="font-bold text-xl text-[#1A6EF0]">
@@ -67,8 +67,8 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
           </p>
         </div>
 
-        <div className="p-5 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-          <span className="text-[11px] font-semibold text-[#5F6573] dark:text-[#A6ACB9] uppercase tracking-wider">
+        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
+          <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Skipped Content
           </span>
           <p className={`font-bold text-xl ${nothingSkipped ? 'text-[#22D08B]' : 'text-amber-600'}`}>
@@ -81,12 +81,12 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
       <section className="space-y-4" aria-label="Section titles and merged parts">
         <div className="flex items-center gap-2">
           <Layers className="w-5 h-5 text-[#1A6EF0]" />
-          <h2 className="text-lg font-medium text-[#3A3F4F] dark:text-[#F1F3F7]">
+          <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
             Section Titles Built & Merged Document Parts
           </h2>
         </div>
 
-        <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-[#F9FAFC] dark:bg-[#1A1E27] divide-y divide-zinc-200/80 dark:divide-zinc-800">
+        <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-850 divide-y divide-zinc-200/80 dark:divide-zinc-800">
           {course.sections.map((sec, idx) => (
             <div key={idx} className="p-5 space-y-2">
               <div className="flex items-center justify-between gap-3">
@@ -94,23 +94,23 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
                   <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#1A6EF0]/10 text-[#1A6EF0]">
                     Lesson {idx + 1}
                   </span>
-                  <h3 className="font-semibold text-sm sm:text-base text-[#3A3F4F] dark:text-[#F1F3F7]">
+                  <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
                     {sec.title}
                   </h3>
                 </div>
-                <span className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                   {sec.content.split(/\s+/).filter(Boolean).length} words
                 </span>
               </div>
 
               {/* Merged Parts list */}
               {sec.mergedParts && sec.mergedParts.length > 0 && (
-                <div className="pl-2 pt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                <div className="pl-2 pt-1 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
                   <span className="text-[11px] font-medium">Merged document parts:</span>
                   {sec.mergedParts.map((part, pIdx) => (
                     <span
                       key={pIdx}
-                      className="px-2.5 py-0.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-[11px] text-[#3A3F4F] dark:text-[#F1F3F7]"
+                      className="px-2.5 py-0.5 rounded-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-[11px] text-zinc-800 dark:text-zinc-200"
                     >
                       {part}
                     </span>
@@ -126,21 +126,21 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
       <section className="space-y-4" aria-label="Skipped content log">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-[#22D08B]" />
-          <h2 className="text-lg font-medium text-[#3A3F4F] dark:text-[#F1F3F7]">
+          <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
             Skipped Content Log
           </h2>
         </div>
 
         {!nothingSkipped ? (
           <div className="space-y-3">
-            <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               The following elements were omitted during reading and code verification:
             </p>
-            <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-[#F9FAFC] dark:bg-[#1A1E27] divide-y divide-zinc-200/80 dark:divide-zinc-800 p-2">
+            <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-850 divide-y divide-zinc-200/80 dark:divide-zinc-800 p-2">
               {allSkippedItems.map((item, sIdx) => (
                 <div key={sIdx} className="p-3.5 flex items-start gap-3">
                   <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-xs sm:text-sm text-[#3A3F4F] dark:text-[#F1F3F7]">
+                  <p className="text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
                     {item}
                   </p>
                 </div>
@@ -148,30 +148,30 @@ export const ContentAuditLedger: React.FC<ContentAuditLedgerProps> = ({ course }
             </div>
           </div>
         ) : (
-          <div className="p-6 sm:p-7 rounded-3xl bg-[#F9FAFC] dark:bg-[#1A1E27] border border-zinc-200/80 dark:border-zinc-800 space-y-4">
+          <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 space-y-4">
             <div className="flex items-center gap-2 text-[#1F410B] dark:text-[#B5F55A] text-sm font-semibold">
               <CheckCircle2 className="w-5 h-5 text-[#22D08B]" />
               <span>Nothing was skipped in this document.</span>
             </div>
-            <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Verified first and last sentences of your document:
             </p>
 
             <div className="space-y-3 pt-1">
-              <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#5F6573] dark:text-[#A6ACB9] block">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 dark:text-zinc-400 block">
                   First Sentence of Document (Exact)
                 </span>
-                <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] italic ${fontSizeClass}`}>
+                <p className={`text-zinc-900 dark:text-zinc-100 italic ${fontSizeClass}`}>
                   "{course.firstSentence || course.sections[0]?.content.split('.')[0] + '.'}"
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#5F6573] dark:text-[#A6ACB9] block">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 space-y-1">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 dark:text-zinc-400 block">
                   Last Sentence of Document (Exact)
                 </span>
-                <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] italic ${fontSizeClass}`}>
+                <p className={`text-zinc-900 dark:text-zinc-100 italic ${fontSizeClass}`}>
                   "{course.lastSentence || course.sections[course.sections.length - 1]?.content.trim().split('.').slice(-2, -1)[0]?.trim() + '.'}"
                 </p>
               </div>

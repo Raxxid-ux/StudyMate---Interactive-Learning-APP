@@ -654,7 +654,17 @@ export function AppContent() {
   const currentSection = course?.sections[currentSectionIndex] || null;
 
   return (
-    <div className="min-h-screen w-full bg-[#EDF0F5] dark:bg-[#12151B] text-[#3A3F4F] dark:text-[#F1F3F7] flex flex-col font-sans antialiased transition-colors overflow-x-hidden">
+    <div
+      className={`min-h-screen w-full flex flex-col font-sans antialiased transition-colors overflow-x-hidden ${
+        theme === 'meadow'
+          ? 'bg-[#F4F7F4] dark:bg-[#0E1611] text-[#1A2E22] dark:text-[#ECFDF5]'
+          : theme === 'academia'
+          ? 'bg-[#F7F4EC] dark:bg-[#191512] text-[#2D251E] dark:text-[#F2E8DC]'
+          : theme === 'cosmic'
+          ? 'bg-[#0C1017] text-[#F1F5F9]'
+          : 'bg-[#050505] text-[#FFFFFF]'
+      }`}
+    >
       <Navbar
         course={isProcessing ? null : course}
         activeNav={activeNav}
@@ -828,17 +838,17 @@ export function AppContent() {
       {/* Confirmation Modal for Starting a New Document */}
       {showNewDocConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-[#F9FAFC] dark:bg-[#1A1E27] rounded-3xl max-w-sm w-full p-6 space-y-4 border border-zinc-200/80 dark:border-zinc-800 shadow-xl">
-            <h3 className="text-lg font-medium text-[#3A3F4F] dark:text-[#F1F3F7]">
+          <div className="bg-white dark:bg-zinc-850 rounded-3xl max-w-sm w-full p-6 space-y-4 border border-zinc-200/80 dark:border-zinc-800 shadow-xl">
+            <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
               Start a new document?
             </h3>
-            <p className="text-xs sm:text-sm text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
               This will clear the current course and your quiz progress so you can upload a new document.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setShowNewDocConfirm(false)}
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-[#5F6573] dark:text-[#A6ACB9] hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>

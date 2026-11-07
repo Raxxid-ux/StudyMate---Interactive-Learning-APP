@@ -155,11 +155,6 @@ export const ScholarProgressHeader: React.FC<ScholarProgressHeaderProps> = ({
             >
               {greeting}
             </h2>
-            {isCompact && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                Compact
-              </span>
-            )}
           </div>
 
           <p

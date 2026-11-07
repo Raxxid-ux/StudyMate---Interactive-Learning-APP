@@ -147,10 +147,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>
-              <h2 id="feedback-title" className="text-base sm:text-lg font-bold text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+              <h2 id="feedback-title" className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                 Feedback & Suggestions
               </h2>
-              <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Help us make StudyMate calmer, clearer, and more helpful
               </p>
             </div>
@@ -175,7 +175,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
               <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
                 Thank you for your thoughts!
               </h3>
-              <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] leading-relaxed">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 Your feedback has been logged directly into the StudyMate administration panel. We review every note to make the learning experience simpler and calmer.
               </p>
             </div>

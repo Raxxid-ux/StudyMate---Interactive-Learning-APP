@@ -628,3 +628,12 @@ export const FolderOpen: React.FC<IconProps> = ({ className, size, ...rest }) =>
   </svg>
 );
 
+export const Info: React.FC<IconProps> = ({ className, size, ...rest }) => (
+  <svg {...baseProps(className, size, rest)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 16V12" />
+    <circle cx="12" cy="8" r="0.75" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+

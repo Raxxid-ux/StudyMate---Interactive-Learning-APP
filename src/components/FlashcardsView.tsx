@@ -18,7 +18,7 @@ interface EnrichedFlashcard extends GlossaryItem {
 }
 
 export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
-  const { fontSizeClass } = useThemeAndText();
+  const { fontSizeClass, theme } = useThemeAndText();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [masteredIds, setMasteredIds] = useState<Set<string>>(new Set());
@@ -80,10 +80,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
         <div className="w-16 h-16 mx-auto rounded-3xl bg-[#1A6EF0]/10 text-[#1A6EF0] flex items-center justify-center">
           <Layers className="w-8 h-8" />
         </div>
-        <h2 className="text-3xl font-light text-[#3A3F4F] dark:text-[#F1F3F7]">
+        <h2 className="text-3xl font-light text-zinc-900 dark:text-zinc-100">
           Terms are being compiled
         </h2>
-        <p className="text-[#5F6573] dark:text-[#A6ACB9] text-sm max-w-md mx-auto leading-relaxed">
+        <p className="text-zinc-600 dark:text-zinc-400 text-sm max-w-md mx-auto leading-relaxed">
           Interactive study cards appear here as lessons define key terms from your document.
         </p>
       </div>
@@ -96,20 +96,26 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-zinc-800 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-light text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+            <h1 className="text-3xl font-light text-zinc-900 dark:text-zinc-100 tracking-tight">
               Study Cards
             </h1>
             <span className="border border-zinc-400/40 text-[9px] uppercase tracking-wider px-2 py-0.5 rounded text-zinc-500">
               STUDY DRAFT
             </span>
           </div>
-          <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9] mt-1">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
             Definitions extracted strictly from your document.
           </p>
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-1 bg-[#F9FAFC] dark:bg-[#1A1E27] p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800">
+        <div
+          className={`flex items-center gap-1 p-1 rounded-2xl border ${
+            theme === 'academia'
+              ? 'bg-[#F9F6EE] dark:bg-[#1E1914] border-[#E4D8C8] dark:border-[#382E25]'
+              : 'bg-zinc-100/90 dark:bg-zinc-800/80 border-zinc-200/80 dark:border-zinc-800'
+          }`}
+        >
           <button
             onClick={() => {
               setFilter('all');
@@ -118,8 +124,8 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
             }}
             className={`px-3 py-1 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
               filter === 'all'
-                ? 'bg-white dark:bg-zinc-800 text-[#1A6EF0] shadow-xs'
-                : 'text-[#5F6573] dark:text-[#A6ACB9]'
+                ? 'bg-white dark:bg-zinc-900 text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400'
             }`}
           >
             All ({allCards.length})
@@ -132,8 +138,8 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
             }}
             className={`px-3 py-1 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
               filter === 'learning'
-                ? 'bg-white dark:bg-zinc-800 text-[#1A6EF0] shadow-xs'
-                : 'text-[#5F6573] dark:text-[#A6ACB9]'
+                ? 'bg-white dark:bg-zinc-900 text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400'
             }`}
           >
             Learning ({allCards.length - masteredIds.size})
@@ -146,8 +152,8 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
             }}
             className={`px-3 py-1 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
               filter === 'mastered'
-                ? 'bg-white dark:bg-zinc-800 text-[#1A6EF0] shadow-xs'
-                : 'text-[#5F6573] dark:text-[#A6ACB9]'
+                ? 'bg-white dark:bg-zinc-900 text-[#1A6EF0] dark:text-[#64B5F6] shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400'
             }`}
           >
             Mastered ({masteredIds.size})
@@ -156,12 +162,12 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
       </div>
 
       {filteredCards.length === 0 ? (
-        <div className="p-12 text-center text-[#5F6573] dark:text-[#A6ACB9]">
+        <div className="p-12 text-center text-zinc-500 dark:text-zinc-400">
           No cards in this filter.
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="flex items-center justify-between text-xs font-semibold text-[#5F6573] dark:text-[#A6ACB9]">
+          <div className="flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-zinc-400">
             <span>
               Card {currentIndex + 1} of {filteredCards.length}
             </span>
@@ -173,9 +179,13 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
           {/* Interactive Flip Card */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="w-full min-h-[300px] sm:min-h-[340px] rounded-3xl p-8 sm:p-10 border-2 border-zinc-200/80 dark:border-zinc-800 bg-[#F9FAFC] dark:bg-[#1A1E27] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:border-[#1A6EF0] transition-all cursor-pointer flex flex-col justify-between select-none relative group"
+            className={`w-full min-h-[300px] sm:min-h-[340px] rounded-3xl p-8 sm:p-10 border-2 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:border-[#1A6EF0] transition-all cursor-pointer flex flex-col justify-between select-none relative group ${
+              theme === 'academia'
+                ? 'bg-[#F9F6EE] dark:bg-[#1E1914] border-[#E4D8C8] dark:border-[#382E25]'
+                : 'bg-white dark:bg-zinc-850 border-zinc-200/80 dark:border-zinc-800'
+            }`}
           >
-            <div className="flex items-center justify-between text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+            <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
               <span className="font-semibold uppercase tracking-wider text-[10px]">
                 {isFlipped ? 'Document Explanation' : 'Defined Term'}
               </span>
@@ -185,16 +195,16 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
             <div className="my-auto py-6 text-center space-y-4">
               {!isFlipped ? (
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-light text-[#3A3F4F] dark:text-[#F1F3F7] tracking-tight">
+                  <h3 className="text-3xl font-light text-zinc-900 dark:text-zinc-100 tracking-tight">
                     {currentCard.term}
                   </h3>
-                  <p className="text-xs text-[#5F6573] dark:text-[#A6ACB9]">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Tap to see what the document says
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3 max-w-lg mx-auto">
-                  <p className={`text-[#3A3F4F] dark:text-[#F1F3F7] ${fontSizeClass} font-normal leading-relaxed`}>
+                  <p className={`text-zinc-800 dark:text-zinc-200 ${fontSizeClass} font-normal leading-relaxed`}>
                     {currentCard.definition}
                   </p>
                   {currentCard.definition.includes('Mentioned in the text, but not defined') && (
@@ -207,7 +217,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-zinc-200/80 dark:border-zinc-800">
-              <span className="text-xs text-[#5F6573] dark:text-[#A6ACB9] flex items-center gap-1">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                 <RotateCcw className="w-3.5 h-3.5 text-[#1A6EF0]" /> Tap to flip
               </span>
 
@@ -220,7 +230,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors cursor-pointer ${
                   masteredIds.has(currentCard.id)
                     ? 'bg-[#A8C7FA] text-[#0A387E]'
-                    : 'bg-zinc-200 dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] hover:bg-zinc-300'
+                    : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-300'
                 }`}
               >
                 <CheckCircle className="w-3.5 h-3.5" />
@@ -234,7 +244,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ course }) => {
             <button
               type="button"
               onClick={handlePrev}
-              className="h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[#3A3F4F] dark:text-[#F1F3F7] text-xs sm:text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer whitespace-nowrap shadow-2xs"
+              className="h-11 px-4 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer whitespace-nowrap shadow-2xs"
             >
               <ChevronLeft className="w-4 h-4 shrink-0" />
               <span className="leading-none">Previous</span>

@@ -123,7 +123,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
   // COMPACT NAVBAR WIDGET
   if (compact) {
     return (
-      <div className="flex items-center gap-1.5 h-8.5 sm:h-9 px-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100/90 dark:bg-zinc-800/90 text-[#3A3F4F] dark:text-[#F1F3F7] shadow-2xs">
+      <div className="flex items-center gap-1.5 h-8.5 sm:h-9 px-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100/90 dark:bg-zinc-800/90 text-zinc-900 dark:text-zinc-100 shadow-2xs">
         <button
           type="button"
           onClick={onOpenFull}

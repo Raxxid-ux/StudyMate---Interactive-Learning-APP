@@ -47,10 +47,10 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
         <div className="w-16 h-16 mx-auto rounded-3xl bg-[#B5F55A]/30 text-[#1F410B] dark:text-[#B5F55A] flex items-center justify-center">
           <CheckCircle2 className="w-8 h-8 text-[#22D08B]" />
         </div>
-        <h2 className="text-3xl font-light text-[#3A3F4F] dark:text-[#F1F3F7]">
+        <h2 className="text-3xl font-light text-zinc-900 dark:text-zinc-100">
           No mistakes to review
         </h2>
-        <p className="text-[#5F6573] dark:text-[#A6ACB9] max-w-md mx-auto text-sm leading-relaxed">
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-md mx-auto text-sm leading-relaxed">
           You've mastered all attempted questions so far. Any question you miss in a lesson quiz will appear here so you can try again calmly.
         </p>
       </div>
@@ -62,11 +62,11 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
       {/* Header */}
       <div className="border-b border-zinc-200/80 dark:border-zinc-800 pb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-light text-[#3A3F4F] dark:text-[#F1F3F7] flex items-center gap-2.5">
+          <h1 className="text-3xl font-light text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
             <AlertCircle className="w-6 h-6 text-[#1A6EF0]" />
             <span>Review My Mistakes</span>
           </h1>
-          <p className="text-xs sm:text-sm text-[#5F6573] dark:text-[#A6ACB9] mt-1">
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1">
             Re-attempt each question. Once answered correctly, it is removed from this list.
           </p>
         </div>
@@ -88,12 +88,12 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
               className={`p-7 rounded-3xl border transition-all ${
                 isSolved
                   ? 'bg-[#B5F55A]/15 border-[#22D08B]'
-                  : 'bg-[#F9FAFC] dark:bg-[#1A1E27] border-zinc-200/80 dark:border-zinc-800 shadow-xs'
+                  : 'bg-white dark:bg-zinc-850 border-zinc-200/80 dark:border-zinc-800 shadow-xs'
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#5F6573] dark:text-[#A6ACB9]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     From Lesson {question.sectionIndex + 1}:
                   </span>
                   <button
@@ -114,7 +114,7 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
                 )}
               </div>
 
-              <h3 className={`font-medium text-[#3A3F4F] dark:text-[#F1F3F7] mb-4 ${fontSizeClass}`}>
+              <h3 className={`font-medium text-zinc-900 dark:text-zinc-100 mb-4 ${fontSizeClass}`}>
                 {question.question}
               </h3>
 
@@ -125,7 +125,7 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
                   const isRight = opt === question.correctAnswer;
 
                   let style =
-                    'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/40 text-[#3A3F4F] dark:text-[#F1F3F7] hover:border-zinc-400';
+                    'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/40 text-zinc-800 dark:text-zinc-100 hover:border-zinc-400';
 
                   if (isSelected) {
                     if (isRight) {
@@ -169,9 +169,9 @@ export const ReviewMistakesView: React.FC<ReviewMistakesViewProps> = ({
                 </button>
 
                 {isQuoteOpen && (
-                  <div className="mt-2.5 p-4 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-xs sm:text-sm text-[#3A3F4F] dark:text-[#F1F3F7] italic space-y-1">
+                  <div className="mt-2.5 p-4 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 italic space-y-1">
                     <p>"{question.sourceQuote}"</p>
-                    <p className="text-[11px] not-italic text-[#5F6573] dark:text-[#A6ACB9]">
+                    <p className="text-[11px] not-italic text-zinc-500 dark:text-zinc-400">
                       From: {question.sectionTitle}
                     </p>
                   </div>
